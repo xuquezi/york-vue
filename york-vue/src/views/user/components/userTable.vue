@@ -240,7 +240,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        console.log(val.userId)
+        // console.log(val.userId)
         deleteUser(val.userId).then(() => {
           this.getList()
           this.$notify({

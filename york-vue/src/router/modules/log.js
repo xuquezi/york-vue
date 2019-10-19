@@ -14,6 +14,12 @@ const logsRouter = {
   },
   children: [
     {
+      path: 'login',
+      component: () => import('@/views/logs/login'),
+      name: 'Login',
+      meta: { title: 'login', noCache: true }
+    },
+    {
       path: 'operate',
       component: () => import('@/views/logs/operate'),
       name: 'Operate',
