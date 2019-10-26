@@ -12,6 +12,15 @@
       <el-table-column label="Name" prop="loginUsername"/>
       <el-table-column label="Ip" prop="loginIp"/>
       <el-table-column label="LoginTime" prop="loginTime"/>
+      <el-table-column
+        align="center">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="danger"
+            @click="deleteLoginLog(scope.row)">Del</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
   </div>
@@ -20,7 +29,7 @@
 <script>
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import ElDragSelect from '@/components/DragSelect'
-import { fetchLoginLogList } from '@/api/log'
+import { fetchLoginLogList,deleteLoginLog } from '@/api/log'
 export default {
   name: 'LoginIndex',
   components: { Pagination, ElDragSelect },
@@ -52,6 +61,29 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
+    },
+    deleteLoginLog(val) {
+      this.$confirm('确定删除该条记录吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // console.log(val.userId)
+        deleteLoginLog(val.loginId).then(() => {
+          this.getList()
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     }
   }
 }

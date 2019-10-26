@@ -37,27 +37,22 @@
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-row type="flex" justify="center">
+        <el-button :loading="loading" type="primary" @click.native.prevent="handleLogin" style="width:50%">Login</el-button>
+        <el-button @click.native.prevent="handleRegister" style="width:50%">Register</el-button>
+      </el-row>
     </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('密码不能小于6位数'))
       } else {
         callback()
       }
@@ -68,7 +63,6 @@ export default {
         password: '123456'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
@@ -110,6 +104,9 @@ export default {
           return false
         }
       })
+    },
+    handleRegister() {
+      this.$router.push({ path: '/register' })
     }
   }
 }

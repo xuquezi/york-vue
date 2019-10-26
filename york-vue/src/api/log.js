@@ -32,3 +32,18 @@ export function fetchLoginLogList(query) {
   })
 }
 
+export function fetchLogoutLogList(query) {
+  return request({
+    url: '/log/logout/page',
+    method: 'get',
+    params: query
+  })
+}
+
+export function deleteLoginLog(loginId) {
+  return request({
+    url: '/log/login/deleteLoginLog',
+    method: 'delete',
+    params: { loginId }
+  })
+}

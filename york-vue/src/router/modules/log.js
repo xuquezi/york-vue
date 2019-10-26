@@ -20,6 +20,12 @@ const logsRouter = {
       meta: { title: 'login', noCache: true }
     },
     {
+      path: 'logout',
+      component: () => import('@/views/logs/logout'),
+      name: 'Logout',
+      meta: { title: 'logout', noCache: true }
+    },
+    {
       path: 'operate',
       component: () => import('@/views/logs/operate'),
       name: 'Operate',
