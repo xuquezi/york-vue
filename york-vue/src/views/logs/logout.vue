@@ -6,7 +6,9 @@
     </div>
     <el-table
       :data="list"
-      style="width: 100%">
+      style="width: 100%"
+      element-loading-text="拼命加载中"
+      v-loading="listLoading">
       <el-table-column
         label="Name"
         prop="logoutUsername"/>

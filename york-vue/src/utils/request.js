@@ -2,6 +2,7 @@ import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import router from '@/router'
 
 // create an axios instance
 const service = axios.create({
@@ -51,21 +52,25 @@ service.interceptors.response.use(
       Message({
         message: res.message || 'Error',
         type: 'error',
-        duration: 5 * 1000
+        duration: 2 * 1000
       })
 
       // 50008: Illegal token 非法token; 50012: Other clients logged in 其他用户登录; 20004: Token expired token过期;
       if (res.code === 50008 || res.code === 50012 || res.code === 20004) {
         // to re-login
-        MessageBox.confirm('你已经被登出, 你可以取消或重新登录', '登出确认', {
+        MessageBox.confirm('你已经被登出, 请重新登录', '登出确认', {
           confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
+          showCancelButton: false,//只能重新登录，不能取消操作
           type: 'warning'
         }).then(() => {
           store.dispatch('user/resetToken').then(() => {
             location.reload()
           })
         })
+      }
+      // console.log(res.code === 20005)
+      if(res.code === 20005){
+        router.push({ path: '/500' })
       }
       return Promise.reject(new Error(res.message || 'Error'))
     } else {
@@ -77,7 +82,7 @@ service.interceptors.response.use(
     Message({
       message: error.message,
       type: 'error',
-      duration: 5 * 1000
+      duration: 2*1000
     })
     return Promise.reject(error)
   }

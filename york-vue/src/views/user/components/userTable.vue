@@ -34,6 +34,7 @@
               <span>
                 <el-tag v-if="props.row.status=='0'" :type="props.row.status | statusFilter" size="small">Use</el-tag>
                 <el-tag v-if="props.row.status=='1'" :type="props.row.status| statusFilter" size="small">Stop</el-tag>
+                <el-tag v-if="props.row.status=='2'" :type="props.row.status| statusFilter" size="small">Wait</el-tag>
               </span>
             </el-form-item>
             <el-form-item label="BornTime:">
@@ -68,8 +69,8 @@
       <el-table-column label="Born" prop="born" />
       <el-table-column label="Sex" class-name="status-col" width="100">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.sex=='0'" :type="scope.row.sex | sexFilter" >Male</el-tag>
-          <el-tag v-if="scope.row.sex=='1'" :type="scope.row.sex| sexFilter" >FeMale</el-tag>
+          <el-tag v-if="scope.row.sex=='0'" :type="scope.row.sex | sexFilter" >男</el-tag>
+          <el-tag v-if="scope.row.sex=='1'" :type="scope.row.sex| sexFilter" >女</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -88,6 +89,11 @@
             size="mini"
             type="success"
             @click="stopAndUse(scope.row)">Use</el-button>
+          <el-button
+            v-if="scope.row.status=='2'"
+            size="mini"
+            type="warning"
+            @click="activate(scope.row)">Act</el-button>
           <el-button
             size="mini"
             type="primary"
@@ -132,7 +138,7 @@
 
 <script>// Secondary package based on el-pagination
 
-import { fetchList,updateUser,stopAndUse,deleteUser } from '@/api/user'
+import { fetchList,updateUser,stopAndUse,deleteUser,activate } from '@/api/user'
 import Pagination from '@/components/Pagination'
 import ElDragSelect from '@/components/DragSelect' // base on element-ui
 import { getRoles } from '@/api/role'
@@ -175,14 +181,15 @@ export default {
     sexFilter(status) {
       const statusMap = {
         0: 'success',
-        1: 'danger'
+        1: 'danger',
       }
       return statusMap[status]
     },
     statusFilter(status) {
       const statusMap = {
         0: 'success',
-        1: 'danger'
+        1: 'danger',
+        2: 'warning'
       }
       return statusMap[status]
     }
@@ -231,7 +238,6 @@ export default {
             label: item.roleName
           })
         })
-        // console.logs(this.roleList)
       })
     },
     deleteUser(val){
@@ -240,7 +246,6 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // console.log(val.userId)
         deleteUser(val.userId).then(() => {
           this.getList()
           this.$notify({
@@ -258,8 +263,6 @@ export default {
       });
     },
     stopAndUse(val) {
-      // console.logs(val.status)
-      // console.logs(val.userId)
       this.$confirm('确定要停用/启用该用户吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -273,7 +276,29 @@ export default {
             type: 'success',
             duration: 2000
           })
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消操作'
         });
+      });
+    },
+    activate(val) {
+      this.$confirm('确定要激活该用户吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        activate(val.userId).then(() => {
+          this.getList()
+          this.$notify({
+            title: '成功',
+            message: '激活成功',
+            type: 'success',
+            duration: 2000
+          })
+        })
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -284,7 +309,6 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          // console.logs(this.temp.staffSex)
           const tempData = Object.assign({}, this.temp)
           updateUser(tempData).then(() => {
             this.getList()

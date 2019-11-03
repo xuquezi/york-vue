@@ -6,9 +6,9 @@
     <el-row>
       <el-col :span="12">
         <h1 class="text-jumbo text-ginormous">
-          404!
+          500!
         </h1>
-        <h2>服务器没有对应资源!</h2>
+        <h2>服务器运行异常,请联系管理员!</h2>
         <ul class="list-unstyled">
           <li>或者你可以:</li>
           <li class="link-type">
@@ -26,27 +26,27 @@
 </template>
 
 <script>
-import errGif from '@/assets/err_images/err.gif'
+  import errGif from '@/assets/err_images/err.gif'
 
-export default {
-  name: 'Page401',
-  data() {
-    return {
-      errGif: errGif + '?' + +new Date(),
-      ewizardClap: 'https://wpimg.wallstcn.com/007ef517-bafd-4066-aae4-6883632d9646',
-      dialogVisible: false
-    }
-  },
-  methods: {
-    back() {
-      if (this.$route.query.noGoBack) {
-        this.$router.push({ path: '/dashboard' })
-      } else {
-        this.$router.go(-1)
+  export default {
+    name: 'Page401',
+    data() {
+      return {
+        errGif: errGif + '?' + +new Date(),
+        ewizardClap: 'https://wpimg.wallstcn.com/007ef517-bafd-4066-aae4-6883632d9646',
+        dialogVisible: false
+      }
+    },
+    methods: {
+      back() {
+        if (this.$route.query.noGoBack) {
+          this.$router.push({ path: '/dashboard' })
+        } else {
+          this.$router.go(-1)
+        }
       }
     }
   }
-}
 </script>
 
 <style lang="scss" scoped>
