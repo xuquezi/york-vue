@@ -320,6 +320,8 @@ export default {
               duration: 2000
             })
           })
+        }else {
+          return false
         }
       })
     }

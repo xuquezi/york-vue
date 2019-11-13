@@ -50,9 +50,11 @@
 
 
 <script>
-  import { validUsername,validEmail } from '@/utils/validate'
+  import { validUsername,validEmail,validTel } from '@/utils/validate'
   import { registerUser,sendCode } from '@/api/register'
   import PanThumb from '@/components/PanThumb'
+  import router from '@/router'
+
   const TIME_COUNT = 60
   export default {
     name: 'register',
@@ -63,11 +65,13 @@
       const validateEmail = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('请正确填写邮箱！'));
+          return;//防止继续调用下一步
         }
         if (value !== '') {
           var reg=/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
           if(!reg.test(value)){
             callback(new Error('请输入有效的邮箱！'));
+            return;//防止继续调用下一步
           }
         }
         validEmail(value).then(data => {
@@ -82,6 +86,7 @@
       const validateUsername = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('请输入用户名'));
+          return;//防止继续调用下一步
         }
         validUsername(value).then(data => {
           const flag = data
@@ -122,18 +127,27 @@
       const validateTel = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('手机号不可为空!'));
-        } else {
-          if (value !== '') {
-            var reg=/^1[3456789]\d{9}$/;
-            if(!reg.test(value)){
-              callback(new Error('请输入有效的手机号码!'));
-            }
-          }
-          callback();
+          return;
         }
+        if (value !== '') {
+          var reg=/^1[3456789]\d{9}$/;
+          if(!reg.test(value)){
+            callback(new Error('请输入有效的手机号码!'));
+            return;
+          }
+        }
+        validTel(value).then(data => {
+          if(!data){
+            callback(new Error('该电话已经被注册！'))
+          }else{
+            callback()
+          }
+        })
+
       }
       return {
         registerForm: {
+          key: '',//验证码redis主键的key
           username: '',
           password: '',
           confirmPass: '',
@@ -142,7 +156,7 @@
           sex: 0,//默认男
           born: '',
           code: '',
-          avatar: 'group1/M00/00/00/wKgZhV21XoGAcRFYAAEbzRWdZT061.jpeg'//默认头像
+          avatar: 'http://192.168.25.133/group1/M00/00/00/wKgZhV21X-2AHkV6AAC8e333r1k80.jpeg'//默认头像
         },
         show: true,
         count: '',
@@ -160,15 +174,24 @@
       register() {
         this.$refs.registerForm.validate(valid => {
           if (valid) {
-            registerUser(this.registerForm).then({
-
+            registerUser(this.registerForm).then(()=>{
+              //每次route之前都会校验有没有token然后调用user初始化设置角色。
+              //所以要想注册后直接跳转首页需要设置token的。
+              //这里偷懒直接跳转到login（在白名单内的），让用户直接再次登录输入一次。
+              this.$message({
+                message: '注册成功，请登录！',
+                type: 'success'
+              });
+              router.push({ path: '/login' })
             })
           }
         })
       },
       getCode (tel) {
         // 验证码倒计时
-        sendCode(tel).then(()=>{
+        sendCode(tel).then(response=>{
+          this.registerForm.key = response.key
+          console.info(this.registerForm.key)
           if (!this.timer) {
             this.count = TIME_COUNT
             this.show = false

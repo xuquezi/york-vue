@@ -6,7 +6,7 @@
  * @param {string} path
  * @returns {Boolean}
  */
-import { queryUsername,queryEmail } from '@/api/register'
+import { queryUsername,queryEmail,queryTel } from '@/api/register'
 export function isExternal(path) {
   return /^(https?:|mailto:|tel:)/.test(path)
 }
@@ -30,6 +30,18 @@ export function validEmail(email) {
     queryEmail(email).then(response =>{
       const emailFlag = response.flag
       resolve(emailFlag)
+    }).catch(error => {
+      reject(error)
+    })
+  })
+}
+
+export function validTel(tel) {
+  //这里要用promise的写法，才会同步返回数据.
+  return new Promise((resolve, reject) => {
+    queryTel(tel).then(response =>{
+      const telFlag = response.flag
+      resolve(telFlag)
     }).catch(error => {
       reject(error)
     })
