@@ -5,7 +5,7 @@
         <h3 class="title">Register</h3>
       </div>
       <el-form-item label="头像" prop="avatar">
-        <pan-thumb width="60px" height="60px" image="http://192.168.25.133/group1/M00/00/00/wKgZhV21X-2AHkV6AAC8e333r1k80.jpeg" v-model="registerForm.avatar">
+        <pan-thumb width="60px" height="60px" image="https://york-vue-1259592596.cos.ap-chengdu.myqcloud.com/avatar/avatar.jpg" v-model="registerForm.avatar">
           york
         </pan-thumb>
       </el-form-item>
@@ -156,7 +156,7 @@
           sex: 0,//默认男
           born: '',
           code: '',
-          avatar: 'http://192.168.25.133/group1/M00/00/00/wKgZhV21X-2AHkV6AAC8e333r1k80.jpeg'//默认头像
+          avatar: 'https://york-vue-1259592596.cos.ap-chengdu.myqcloud.com/avatar/avatar.jpg'//默认头像
         },
         show: true,
         count: '',
