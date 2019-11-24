@@ -18,6 +18,15 @@
       <el-table-column
         label="LogoutTime"
         prop="logoutTime"/>
+      <el-table-column
+        align="center">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="danger"
+            @click="deleteLogoutLog(scope.row)">Del</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
   </div>
@@ -26,7 +35,7 @@
 <script>
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import ElDragSelect from '@/components/DragSelect'
-import { fetchLogoutLogList } from '@/api/log'
+import { fetchLogoutLogList,deleteLogoutLog } from '@/api/log'
 export default {
   name: 'LogoutIndex',
   components: { Pagination, ElDragSelect },
@@ -54,6 +63,29 @@ export default {
         this.listLoading = false
         // console.log(this.list)
       })
+    },
+    deleteLogoutLog(val) {
+      this.$confirm('确定删除该条记录吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // console.log(val.userId)
+        deleteLogoutLog(val.logoutId).then(() => {
+          this.getList()
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     },
     handleFilter() {
       this.listQuery.page = 1

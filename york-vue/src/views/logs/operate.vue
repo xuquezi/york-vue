@@ -103,7 +103,6 @@ export default {
           message: '请选择至少一条数据'
         })
       }
-
     },
     deleteLog(val) {
       this.$confirm('确定删除该条记录吗？', '提示', {

@@ -47,3 +47,19 @@ export function deleteLoginLog(loginId) {
     params: { loginId }
   })
 }
+
+export function deleteLogoutLog(logoutId) {
+  return request({
+    url: '/log/logout/deleteLogoutLog',
+    method: 'delete',
+    params: { logoutId }
+  })
+}
+
+export function deleteSelectedLoginLog(data) {
+  return request({
+    url: '/log/login/deleteSelectedLoginLog',
+    method: 'delete',
+    data
+  })
+}

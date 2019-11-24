@@ -25,7 +25,7 @@
         <el-input v-model="registerForm.tel" placeholder="请输入手机！"></el-input>
       </el-form-item>
       <el-form-item label="" prop="code" class="pr">
-        <el-input prop="code" v-model="registerForm.code" placeholder="验证码"></el-input>
+        <el-input prop="code" v-model="registerForm.code" placeholder="请输入6位验证码！"></el-input>
         <button @click="getCode(registerForm.tel)" class="code-btn" :disabled="!show">
           <span v-show="show">发送验证码</span>
           <span v-show="!show" class="count">{{count}} s</span>
@@ -42,7 +42,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="register">注册</el-button>
-        <el-button>取消</el-button>
+        <el-button @click="cancelRegister">取消</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -143,7 +143,20 @@
             callback()
           }
         })
-
+      }
+      const validateCode = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入验证码！'));
+          return;
+        }
+        if (value!== '') {
+          var reg=/^\d{6}$/;
+          if(!reg.test(value)){
+            callback(new Error('验证码为6位数字格式!'));
+            return;
+          }
+        }
+        callback()
       }
       return {
         registerForm: {
@@ -166,7 +179,8 @@
           username: [{ required: true, trigger: 'blur', validator: validateUsername }],
           password: [{ required: true, trigger: 'blur', validator: validatePassword }],
           confirmPass: [{ required: true, trigger: 'blur', validator: validateConfirmPassword }],
-          tel: [{ required: true, trigger: 'blur', validator: validateTel }]
+          tel: [{ required: true, trigger: 'blur', validator: validateTel }],
+          code: [{ required: true, trigger: 'blur', validator: validateCode }]
         }
       }
     },
@@ -186,6 +200,9 @@
             })
           }
         })
+      },
+      cancelRegister() {
+        router.push({ path: '/login' })
       },
       getCode (tel) {
         // 验证码倒计时
