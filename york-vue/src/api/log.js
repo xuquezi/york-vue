@@ -63,3 +63,35 @@ export function deleteSelectedLoginLog(data) {
     data
   })
 }
+
+export function fetchTaskLogList(query) {
+  return request({
+    url: '/log/task/page',
+    method: 'get',
+    params: query
+  })
+}
+
+export function deleteTaskLog(taskId) {
+  return request({
+    url: '/log/task/deleteTaskLog',
+    method: 'delete',
+    params: { taskId }
+  })
+}
+
+export function fetchMessageLogList(query) {
+  return request({
+    url: '/log/message/page',
+    method: 'get',
+    params: query
+  })
+}
+
+export function deleteMessageLog(messageId) {
+  return request({
+    url: '/log/message/deleteMessageLog',
+    method: 'delete',
+    params: { messageId }
+  })
+}

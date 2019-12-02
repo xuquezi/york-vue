@@ -207,8 +207,9 @@
       getCode (tel) {
         // 验证码倒计时
         sendCode(tel).then(response=>{
+          console.log(response)
           this.registerForm.key = response.key
-          console.info(this.registerForm.key)
+          // console.info(this.registerForm.key)
           if (!this.timer) {
             this.count = TIME_COUNT
             this.show = false

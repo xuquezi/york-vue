@@ -30,6 +30,18 @@ const logsRouter = {
       component: () => import('@/views/logs/operate'),
       name: 'Operate',
       meta: { title: 'operate', noCache: true }
+    },
+    {
+      path: 'task',
+      component: () => import('@/views/logs/task'),
+      name: 'Task',
+      meta: { title: 'task', noCache: true }
+    },
+    {
+      path: 'message',
+      component: () => import('@/views/logs/message'),
+      name: 'Message',
+      meta: { title: 'message', noCache: true }
     }
   ]
 }
