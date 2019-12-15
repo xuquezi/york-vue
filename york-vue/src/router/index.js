@@ -91,6 +91,19 @@ export const asyncRoutes = [
       }
     ]
   },
+  {
+    path: '/role',
+    component: Layout,
+    meta: { roles: ['admin'] },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/role/index'),
+        name: 'Role',
+        meta: { title: 'role', icon: 'role' }
+      }
+    ]
+  },
   logsRouter,
   {
     path: 'external-link',

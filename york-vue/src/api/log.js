@@ -95,3 +95,11 @@ export function deleteMessageLog(messageId) {
     params: { messageId }
   })
 }
+
+export function deleteSelectedLogoutLog(data) {
+  return request({
+    url: '/log/logout/deleteSelectedLogoutLog',
+    method: 'delete',
+    data
+  })
+}

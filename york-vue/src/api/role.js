@@ -7,3 +7,18 @@ export function getRoles() {
   })
 }
 
+export function fetchRoleList(query) {
+  return request({
+    url: '/role/page',
+    method: 'get',
+    params: query
+  })
+}
+
+export function stopAndUseRole(roleId,status) {
+  return request({
+    url: '/role/stopAndUseRole',
+    method: 'put',
+    params: { roleId,status }
+  })
+}
