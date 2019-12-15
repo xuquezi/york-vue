@@ -9,14 +9,6 @@
           500!
         </h1>
         <h2>激活失败，邮件有效期已过，请于明天9点后重新注册!</h2>
-        <ul class="list-unstyled">
-          <li>或者你可以:</li>
-          <li class="link-type">
-            <router-link to="/dashboard">
-              回首页
-            </router-link>
-          </li>
-        </ul>
       </el-col>
       <el-col :span="12">
         <img :src="errGif" width="313" height="428" alt="Girl has dropped her ice cream.">
@@ -27,6 +19,7 @@
 
 <script>
   import errGif from '@/assets/err_images/err.gif'
+  import store from '@/store'
 
   export default {
     name: 'registerActiveError',
@@ -39,11 +32,10 @@
     },
     methods: {
       back() {
-        if (this.$route.query.noGoBack) {
-          this.$router.push({ path: '/dashboard' })
-        } else {
-          this.$router.go(-1)
-        }
+        // 先清除一下token，role等信息
+        store.dispatch('user/resetToken').then(() => {
+          this.$router.push({ path: '/login' })
+        })
       }
     }
   }

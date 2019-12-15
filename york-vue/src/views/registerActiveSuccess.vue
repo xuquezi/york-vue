@@ -19,6 +19,7 @@
 
 <script>
   import errGif from '@/assets/err_images/err.gif'
+  import store from '@/store'
 
   export default {
     name: 'registerActiveSuccess',
@@ -31,7 +32,10 @@
     },
     methods: {
       login() {
-        this.$router.push({ path: '/login' })
+        // 先清除一下token，role等信息
+        store.dispatch('user/resetToken').then(() => {
+          this.$router.push({ path: '/login' })
+        })
       }
     }
   }

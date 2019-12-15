@@ -64,7 +64,7 @@ service.interceptors.response.use(
           type: 'warning'
         }).then(() => {
           store.dispatch('user/resetToken').then(() => {
-            location.reload()
+              location.reload()
           })
         })
       }
