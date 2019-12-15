@@ -8,7 +8,7 @@
         <h1 class="text-jumbo text-ginormous">
           500!
         </h1>
-        <h2>服务器运行异常,请联系管理员!</h2>
+        <h2>激活失败，邮件有效期已过，请于明天9点后重新注册!</h2>
         <ul class="list-unstyled">
           <li>或者你可以:</li>
           <li class="link-type">
@@ -29,7 +29,7 @@
   import errGif from '@/assets/err_images/err.gif'
 
   export default {
-    name: 'Page500',
+    name: 'registerActiveError',
     data() {
       return {
         errGif: errGif + '?' + +new Date(),

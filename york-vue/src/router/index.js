@@ -55,6 +55,16 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/registerActiveError',
+    component: () => import('@/views/registerActiveError'),
+    hidden: true
+  },
+  {
+    path: '/registerActiveSuccess',
+    component: () => import('@/views/registerActiveSuccess'),
+    hidden: true
+  },
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',

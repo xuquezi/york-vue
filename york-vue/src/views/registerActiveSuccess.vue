@@ -1,22 +1,14 @@
 <template>
   <div class="errPage-container">
-    <el-button icon="el-icon-arrow-left" class="pan-back-btn" @click="back">
-      返回
+    <el-button icon="el-icon-arrow-left" class="pan-back-btn" @click="login">
+      登录
     </el-button>
     <el-row>
       <el-col :span="12">
         <h1 class="text-jumbo text-ginormous">
-          500!
+          200!
         </h1>
-        <h2>服务器运行异常,请联系管理员!</h2>
-        <ul class="list-unstyled">
-          <li>或者你可以:</li>
-          <li class="link-type">
-            <router-link to="/dashboard">
-              回首页
-            </router-link>
-          </li>
-        </ul>
+        <h2>激活成功，请登录!</h2>
       </el-col>
       <el-col :span="12">
         <img :src="errGif" width="313" height="428" alt="Girl has dropped her ice cream.">
@@ -29,7 +21,7 @@
   import errGif from '@/assets/err_images/err.gif'
 
   export default {
-    name: 'Page500',
+    name: 'registerActiveSuccess',
     data() {
       return {
         errGif: errGif + '?' + +new Date(),
@@ -38,12 +30,8 @@
       }
     },
     methods: {
-      back() {
-        if (this.$route.query.noGoBack) {
-          this.$router.push({ path: '/dashboard' })
-        } else {
-          this.$router.go(-1)
-        }
+      login() {
+        this.$router.push({ path: '/login' })
       }
     }
   }

@@ -24,13 +24,6 @@
       <el-form-item label="手机" prop="tel">
         <el-input v-model="registerForm.tel" placeholder="请输入手机！"></el-input>
       </el-form-item>
-      <el-form-item label="" prop="code" class="pr">
-        <el-input prop="code" v-model="registerForm.code" placeholder="请输入6位验证码！"></el-input>
-        <button @click="getCode(registerForm.tel)" class="code-btn" :disabled="!show">
-          <span v-show="show">发送验证码</span>
-          <span v-show="!show" class="count">{{count}} s</span>
-        </button>
-      </el-form-item>
       <el-form-item label="性别" prop="sex">
         <el-radio-group v-model="registerForm.sex">
           <el-radio :label="0">男</el-radio>
@@ -144,20 +137,6 @@
           }
         })
       }
-      const validateCode = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请输入验证码！'));
-          return;
-        }
-        if (value!== '') {
-          var reg=/^\d{6}$/;
-          if(!reg.test(value)){
-            callback(new Error('验证码为6位数字格式!'));
-            return;
-          }
-        }
-        callback()
-      }
       return {
         registerForm: {
           key: '',//验证码redis主键的key
@@ -179,8 +158,7 @@
           username: [{ required: true, trigger: 'blur', validator: validateUsername }],
           password: [{ required: true, trigger: 'blur', validator: validatePassword }],
           confirmPass: [{ required: true, trigger: 'blur', validator: validateConfirmPassword }],
-          tel: [{ required: true, trigger: 'blur', validator: validateTel }],
-          code: [{ required: true, trigger: 'blur', validator: validateCode }]
+          tel: [{ required: true, trigger: 'blur', validator: validateTel }]
         }
       }
     },
@@ -193,7 +171,7 @@
               //所以要想注册后直接跳转首页需要设置token的。
               //这里偷懒直接跳转到login（在白名单内的），让用户直接再次登录输入一次。
               this.$message({
-                message: '注册成功，请登录！',
+                message: '注册成功，请在3分钟内通过邮件激活账户！',
                 type: 'success'
               });
               router.push({ path: '/login' })
@@ -203,31 +181,6 @@
       },
       cancelRegister() {
         router.push({ path: '/login' })
-      },
-      getCode (tel) {
-        // 验证码倒计时
-        sendCode(tel).then(response=>{
-          console.log(response)
-          this.registerForm.key = response.key
-          // console.info(this.registerForm.key)
-          if (!this.timer) {
-            this.count = TIME_COUNT
-            this.show = false
-            this.timer = setInterval(() => {
-              if (this.count > 0 && this.count <= TIME_COUNT) {
-                this.count--
-              } else {
-                this.show = true
-                clearInterval(this.timer)
-                this.timer = null
-              }
-            }, 1000)
-          }
-          this.$message({
-            message: '发送成功，验证码将在5分钟后失效！',
-            type: 'success'
-          });
-        });
       }
     }
   }
@@ -256,24 +209,5 @@
       font-weight: bold;
     }
   }
-  //验证码样式输入框start
-  .pr {
-    position: relative;
-  }
-  .code-btn {
-    width: 100px;
-    height: 24px;
-    position: absolute;
-    top: 10px;
-    right: 5px;
-    z-index: 222;
-    color: #F5A623;
-    font-size: 14px;
-    border: none;
-    border-left: 1px solid #bababa;
-    padding-left: 10px;
-    background-color: #fff;
-  }
-  //验证码样式输入框end
 
 </style>
