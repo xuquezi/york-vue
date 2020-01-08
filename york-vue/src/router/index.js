@@ -37,13 +37,6 @@ export const constantRoutes = [
     component: () => import('@/views/login/index'),
     hidden: true
   },
-
-  {
-    path: '/register',
-    component: () => import('@/views/register/index'),
-    hidden: true
-  },
-
   {
     path: '/404',
     component: () => import('@/views/404'),
@@ -52,16 +45,6 @@ export const constantRoutes = [
   {
     path: '/500',
     component: () => import('@/views/500'),
-    hidden: true
-  },
-  {
-    path: '/registerActiveError',
-    component: () => import('@/views/registerActiveError'),
-    hidden: true
-  },
-  {
-    path: '/registerActiveSuccess',
-    component: () => import('@/views/registerActiveSuccess'),
     hidden: true
   },
   {

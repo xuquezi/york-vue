@@ -38,8 +38,7 @@
         </span>
       </el-form-item>
       <el-row type="flex" justify="center">
-        <el-button :loading="loading" type="primary" @click.native.prevent="handleLogin" style="width:50%">Login</el-button>
-        <el-button @click.native.prevent="handleRegister" style="width:50%">Register</el-button>
+        <el-button :loading="loading" type="primary" @click.native.prevent="handleLogin" style="width:100%">Login</el-button>
       </el-row>
     </el-form>
   </div>
@@ -104,9 +103,6 @@ export default {
           return false
         }
       })
-    },
-    handleRegister() {
-      this.$router.push({ path: '/register' })
     }
   }
 }

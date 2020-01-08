@@ -46,14 +46,6 @@ export function stopAndUse(userId,status) {
   })
 }
 
-export function activate(userId) {
-  return request({
-    url: '/user/activate',
-    method: 'put',
-    params: { userId }
-  })
-}
-
 export function deleteUser(userId) {
   return request({
     url: '/user/deleteUser',

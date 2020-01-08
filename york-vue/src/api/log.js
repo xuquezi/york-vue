@@ -103,3 +103,19 @@ export function deleteSelectedLogoutLog(data) {
     data
   })
 }
+
+export function deleteSelectedTaskLog(data) {
+  return request({
+    url: '/log/task/deleteSelectedTaskLog',
+    method: 'delete',
+    data
+  })
+}
+
+export function deleteSelectedMessageLog(data) {
+  return request({
+    url: '/log/message/deleteSelectedMessageLog',
+    method: 'delete',
+    data
+  })
+}

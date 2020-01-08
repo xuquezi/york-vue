@@ -3,12 +3,16 @@
     <div class="filter-container">
       <el-input v-model="listQuery.search" placeholder= "任务名搜索" style="width: 200px;" class="filter-item"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ 'search' }}</el-button>
+      <el-button class="filter-item" type="danger" icon="el-icon-delete" @click="deleteSelected">{{ 'delete' }}</el-button>
     </div>
     <el-table
+      @selection-change="handleSelectionChange"
+      ref="multipleTable"
       :data="list"
       style="width: 100%"
       element-loading-text="拼命加载中"
       v-loading="listLoading">
+      <el-table-column type="selection" align="center"/>
       <el-table-column
         label="Name"
         prop="taskName"/>
@@ -38,7 +42,7 @@
 <script>
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import ElDragSelect from '@/components/DragSelect'
-  import { fetchTaskLogList,deleteTaskLog } from '@/api/log'
+  import { fetchTaskLogList,deleteTaskLog,deleteSelectedTaskLog } from '@/api/log'
   export default {
     name: 'TaskIndex',
     components: { Pagination, ElDragSelect },
@@ -47,6 +51,7 @@
         listLoading: true,
         total: 0,
         list: null,
+        multipleSelection: [],
         listQuery: {
           page: 1,
           limit: 10,
@@ -91,6 +96,50 @@
       handleFilter() {
         this.listQuery.page = 1
         this.getList()
+      },
+      deleteSelected() {
+        // console.log(this.multipleSelection.length>0)
+        if(this.multipleSelection.length>0) {
+          let selectedIds = this.getSelectedIds(this.multipleSelection)
+          // console.log(selectedIds)
+          this.$confirm('确定删除已选择的记录吗？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            deleteSelectedTaskLog(selectedIds).then(() => {
+              this.getList()
+              this.$notify({
+                title: '成功',
+                message: '删除成功',
+                type: 'success',
+                duration: 2000
+              })
+            });
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            });
+          });
+        }else {
+          this.$message({
+            type: 'error',
+            message: '请选择至少一条数据'
+          })
+        }
+      },
+      getSelectedIds(val) {
+        if(val){
+          let ids = []
+          val.forEach(item => {
+            ids.push(item.taskId)
+          })
+          return ids
+        }
+      },
+      handleSelectionChange(val) {
+        this.multipleSelection = val
       }
     }
   }
