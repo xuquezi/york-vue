@@ -80,22 +80,6 @@ export function deleteTaskLog(taskId) {
   })
 }
 
-export function fetchMessageLogList(query) {
-  return request({
-    url: '/log/message/page',
-    method: 'get',
-    params: query
-  })
-}
-
-export function deleteMessageLog(messageId) {
-  return request({
-    url: '/log/message/deleteMessageLog',
-    method: 'delete',
-    params: { messageId }
-  })
-}
-
 export function deleteSelectedLogoutLog(data) {
   return request({
     url: '/log/logout/deleteSelectedLogoutLog',
@@ -107,14 +91,6 @@ export function deleteSelectedLogoutLog(data) {
 export function deleteSelectedTaskLog(data) {
   return request({
     url: '/log/task/deleteSelectedTaskLog',
-    method: 'delete',
-    data
-  })
-}
-
-export function deleteSelectedMessageLog(data) {
-  return request({
-    url: '/log/message/deleteSelectedMessageLog',
     method: 'delete',
     data
   })
