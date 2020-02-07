@@ -24,6 +24,13 @@ export function deleteLog(id) {
   })
 }
 
+export function deleteAllOperateLog() {
+  return request({
+    url: '/log/operate/deleteAllOperateLog',
+    method: 'delete'
+  })
+}
+
 export function fetchLoginLogList(query) {
   return request({
     url: '/log/login/page',

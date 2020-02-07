@@ -4,6 +4,7 @@
       <el-input v-model="listQuery.search" placeholder= "操作用户搜索" style="width: 200px;" class="filter-item"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ 'search' }}</el-button>
       <el-button class="filter-item" type="danger" icon="el-icon-delete" @click="deleteSelected">{{ 'delete' }}</el-button>
+      <el-button class="filter-item" type="warning" icon="el-icon-delete" @click="deleteAllOperateLog">{{ 'delAll' }}</el-button>
     </div>
     <el-table
       :data="list"
@@ -35,7 +36,7 @@
 <script>
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import ElDragSelect from '@/components/DragSelect'
-import { fetchOperateLogList,deleteSelected,deleteLog } from '@/api/log'
+import { fetchOperateLogList,deleteSelected,deleteLog,deleteAllOperateLog } from '@/api/log'
 export default {
   name: 'OperateIndex',
   components: { Pagination, ElDragSelect },
@@ -103,6 +104,28 @@ export default {
           message: '请选择至少一条数据'
         })
       }
+    },
+    deleteAllOperateLog() {
+      this.$confirm('确定删除所有操作记录吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteAllOperateLog().then(() => {
+          this.getList()
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     },
     deleteLog(val) {
       this.$confirm('确定删除该条记录吗？', '提示', {

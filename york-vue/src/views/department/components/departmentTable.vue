@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.search" placeholder= "角色名搜索" style="width: 200px;" class="filter-item"/>
+      <el-input v-model="listQuery.search" placeholder= "部门名搜索" style="width: 200px;" class="filter-item"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ 'search' }}</el-button>
     </div>
     <el-table
@@ -13,27 +13,6 @@
       <el-table-column label="Desc" prop="desc"/>
       <el-table-column label="CreateTime" prop="createTime" />
       <el-table-column label="CreateUser" prop="createUser" />
-      <el-table-column label="Status" class-name="status-col" width="100">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.status=='0'" :type="scope.row.status | statusFilter" >use</el-tag>
-          <el-tag v-if="scope.row.status=='1'" :type="scope.row.status | statusFilter" >stop</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
-        align="right">
-        <template slot-scope="scope">
-          <el-button
-            v-if="scope.row.status=='0'"
-            size="mini"
-            type="danger"
-            @click="stopAndUseRole(scope.row)">Stop</el-button>
-          <el-button
-            v-if="scope.row.status=='1'"
-            size="mini"
-            type="success"
-            @click="stopAndUseRole(scope.row)">Use</el-button>
-        </template>
-      </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
   </div>
@@ -42,9 +21,9 @@
 <script>
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import ElDragSelect from '@/components/DragSelect'
-  import { fetchRoleList,stopAndUseRole } from '@/api/role'
+  import { fetchRoleList,stopAndUseRole } from '@/api/department'
   export default {
-    name: 'RoleTable',
+    name: 'DepartmentTable',
     components: { Pagination, ElDragSelect },
     data() {
       return {

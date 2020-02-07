@@ -45,20 +45,24 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
+    // console.log(res.code)
+    // if the custom code is not 10001,10002 it is judged as an error.
+    if (res.code !== 10001 && res.code !== 10002 ) {
+      // 20004: Token过期;在下面判断
+      // 20005: 服务器异常
+      if(res.code !== 20004 && res.code !== 20005){
+        Message({
+          message: res.message || 'Error',
+          type: 'error',
+          duration: 2 * 1000
+        })
+      }
 
-    //console.logs(res.code)
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 10001 && res.code !== 10002) {
-      Message({
-        message: res.message || 'Error',
-        type: 'error',
-        duration: 2 * 1000
-      })
 
-      // 50008: Illegal token 非法token; 50012: Other clients logged in 其他用户登录; 20004: Token expired token过期;
+      // 50008: Illegal token 非法token; 50012: Other clients logged in 其他用户登录; 20004: Token过期;
       if (res.code === 50008 || res.code === 50012 || res.code === 20004) {
         // to re-login
-        MessageBox.confirm('你已经被登出, 请重新登录', '登出确认', {
+        MessageBox.confirm('你已经被登出, 请重新登录！', '登出确认', {
           confirmButtonText: '重新登录',
           showCancelButton: false,//只能重新登录，不能取消操作
           type: 'warning'

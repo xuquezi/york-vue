@@ -138,7 +138,7 @@
 
 <script>// Secondary package based on el-pagination
 
-import { fetchList,updateUser,stopAndUse,deleteUser,activate } from '@/api/user'
+import { fetchList,updateUser,stopAndUse,deleteUser } from '@/api/user'
 import Pagination from '@/components/Pagination'
 import ElDragSelect from '@/components/DragSelect' // base on element-ui
 import { getRoles } from '@/api/role'
@@ -273,28 +273,6 @@ export default {
           this.$notify({
             title: '成功',
             message: '修改成功',
-            type: 'success',
-            duration: 2000
-          })
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消操作'
-        });
-      });
-    },
-    activate(val) {
-      this.$confirm('确定要激活该用户吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        activate(val.userId).then(() => {
-          this.getList()
-          this.$notify({
-            title: '成功',
-            message: '激活成功',
             type: 'success',
             duration: 2000
           })

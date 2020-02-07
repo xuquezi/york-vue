@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.search" placeholder= "角色名搜索" style="width: 200px;" class="filter-item"/>
+      <el-input v-model="listQuery.search" placeholder= "流程名搜索" style="width: 200px;" class="filter-item"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ 'search' }}</el-button>
     </div>
     <el-table
@@ -9,29 +9,17 @@
       style="width: 100%"
       element-loading-text="拼命加载中"
       v-loading="listLoading">
-      <el-table-column label="RoleName" prop="roleName"/>
-      <el-table-column label="Desc" prop="desc"/>
-      <el-table-column label="CreateTime" prop="createTime" />
-      <el-table-column label="CreateUser" prop="createUser" />
-      <el-table-column label="Status" class-name="status-col" width="100">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.status=='0'" :type="scope.row.status | statusFilter" >use</el-tag>
-          <el-tag v-if="scope.row.status=='1'" :type="scope.row.status | statusFilter" >stop</el-tag>
-        </template>
-      </el-table-column>
+      <el-table-column label="Id" prop="processDefId"/>
+      <el-table-column label="Name" prop="processDefName"/>
+      <el-table-column label="Key" prop="processDefKey"/>
+      <el-table-column label="Version" prop="processDefVersion"/>
       <el-table-column
-        align="right">
+        align="center">
         <template slot-scope="scope">
           <el-button
-            v-if="scope.row.status=='0'"
             size="mini"
             type="danger"
-            @click="stopAndUseRole(scope.row)">Stop</el-button>
-          <el-button
-            v-if="scope.row.status=='1'"
-            size="mini"
-            type="success"
-            @click="stopAndUseRole(scope.row)">Use</el-button>
+            @click="startApply(scope.row)">Start</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -42,9 +30,9 @@
 <script>
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import ElDragSelect from '@/components/DragSelect'
-  import { fetchRoleList,stopAndUseRole } from '@/api/role'
+  import { getLastProcessDefList,startApply } from '@/api/apply'
   export default {
-    name: 'RoleTable',
+    name: 'NewApplyIndex',
     components: { Pagination, ElDragSelect },
     data() {
       return {
@@ -58,41 +46,30 @@
         }
       }
     },
-    filters: {
-      statusFilter(status) {
-        const statusMap = {
-          0: 'success',
-          1: 'danger',
-        }
-        return statusMap[status]
-      }
-    },
     created() {
       this.getList()
     },
     methods: {
       getList() {
         this.listLoading = true
-        fetchRoleList(this.listQuery).then(response => {
+        getLastProcessDefList(this.listQuery).then(response => {
           this.list = response.pageInfo.rows
           this.total = response.pageInfo.total
           this.listLoading = false
         })
       },
-      dateFormat(){
-
-      },
-      stopAndUseRole(val) {
-        this.$confirm('确定要停用/启用该角色吗？', '提示', {
+      startApply(val) {
+        this.$confirm('确定发起流程吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          stopAndUseRole(val.roleId,val.status).then(() => {
+          // console.log(val.processDefKey)
+          startApply(val.processDefKey).then(() => {
             this.getList()
             this.$notify({
               title: '成功',
-              message: '修改成功',
+              message: '发起成功',
               type: 'success',
               duration: 2000
             })
@@ -100,7 +77,7 @@
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消操作'
+            message: '已取消发起流程'
           });
         });
       },

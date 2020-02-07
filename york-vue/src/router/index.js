@@ -6,6 +6,8 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/layout'
 import logsRouter from './modules/log'
+import activityRouter from './modules/activity'
+import applyRouter from './modules/apply'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -88,6 +90,9 @@ export const asyncRoutes = [
     ]
   },
   logsRouter,
+  activityRouter,
+  applyRouter,
+
   {
     path: 'external-link',
     component: Layout,
