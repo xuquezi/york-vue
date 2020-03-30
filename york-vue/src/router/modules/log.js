@@ -8,7 +8,7 @@ const logsRouter = {
   redirect: 'noredirect',
   name: 'Logs',
   meta: {
-    title: 'logs',
+    title: '日志管理',
     icon: 'logs',
     roles: ['admin']
   },
@@ -17,25 +17,25 @@ const logsRouter = {
       path: 'login',
       component: () => import('@/views/logs/login'),
       name: 'Login',
-      meta: { title: 'login', noCache: true }
+      meta: { title: '登录日志', noCache: true }
     },
     {
       path: 'logout',
       component: () => import('@/views/logs/logout'),
       name: 'Logout',
-      meta: { title: 'logout', noCache: true }
+      meta: { title: '登出日志', noCache: true }
     },
     {
       path: 'operate',
       component: () => import('@/views/logs/operate'),
       name: 'Operate',
-      meta: { title: 'operate', noCache: true }
+      meta: { title: '操作日志', noCache: true }
     },
     {
       path: 'task',
       component: () => import('@/views/logs/task'),
       name: 'Task',
-      meta: { title: 'task', noCache: true }
+      meta: { title: '定时任务日志', noCache: true }
     }
   ]
 }

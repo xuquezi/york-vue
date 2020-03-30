@@ -6,7 +6,6 @@ Vue.use(Router)
 /* Layout */
 import Layout from '@/layout'
 import logsRouter from './modules/log'
-import activityRouter from './modules/activity'
 import applyRouter from './modules/apply'
 
 /**
@@ -50,6 +49,20 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/profile',
+    component: Layout,
+    redirect: '/profile/index',
+    hidden: true,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/profile/index'),
+        name: 'Profile',
+        meta: { title: 'Profile', icon: 'user', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
@@ -57,7 +70,7 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
+      meta: { title: '首页', icon: 'dashboard', noCache: true }
     }]
   }
 
@@ -72,7 +85,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/user/index'),
         name: 'User',
-        meta: { title: 'user', icon: 'user' }
+        meta: { title: '用户管理', icon: 'user' }
       }
     ]
   },
@@ -85,14 +98,38 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/role/index'),
         name: 'Role',
-        meta: { title: 'role', icon: 'role' }
+        meta: { title: '角色管理', icon: 'role' }
+      }
+    ]
+  },
+  {
+    path: '/department',
+    component: Layout,
+    meta: { roles: ['admin'] },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/department/index'),
+        name: 'Department',
+        meta: { title: '部门管理', icon: 'department' }
+      }
+    ]
+  },
+  {
+    path: '/activity',
+    component: Layout,
+    meta: { roles: ['admin'] },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/activity/processDef'),
+        name: 'Activity',
+        meta: { title: '流程管理', icon: 'activity' }
       }
     ]
   },
   logsRouter,
-  activityRouter,
   applyRouter,
-
   {
     path: 'external-link',
     component: Layout,

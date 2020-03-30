@@ -2,9 +2,9 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.search" placeholder= "操作用户搜索" style="width: 200px;" class="filter-item"/>
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ 'search' }}</el-button>
-      <el-button class="filter-item" type="danger" icon="el-icon-delete" @click="deleteSelected">{{ 'delete' }}</el-button>
-      <el-button class="filter-item" type="warning" icon="el-icon-delete" @click="deleteAllOperateLog">{{ 'delAll' }}</el-button>
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ '搜索' }}</el-button>
+      <el-button class="filter-item" type="danger" icon="el-icon-delete" @click="deleteSelectedOperateLog">{{ '删除' }}</el-button>
+      <el-button class="filter-item" type="warning" icon="el-icon-delete" @click="deleteAllOperateLog">{{ '清空' }}</el-button>
     </div>
     <el-table
       :data="list"
@@ -14,18 +14,18 @@
       element-loading-text="拼命加载中"
       v-loading="listLoading">
       <el-table-column type="selection" align="center"/>
-      <el-table-column label="Name" prop="username" width="200"/>
-      <el-table-column label="Ip" prop="ip" width="200"/>
-      <el-table-column label="VisitTime" prop="visitTime" width="200"/>
-      <el-table-column label="Method" prop="method" width="200"/>
-      <el-table-column label="CostTime" prop="executionTime" width="200"/>
+      <el-table-column label="操作用户" prop="username" width="200"/>
+      <el-table-column label="操作Ip" prop="ip" width="200"/>
+      <el-table-column label="操作时间" prop="visitTime" width="200"/>
+      <el-table-column label="操作方法" prop="method" width="200"/>
+      <el-table-column label="耗时" prop="executionTime" width="200"/>
       <el-table-column
         align="center">
         <template slot-scope="scope">
           <el-button
             size="mini"
             type="danger"
-            @click="deleteLog(scope.row)">Del</el-button>
+            @click="deleteOperateLog(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -36,7 +36,7 @@
 <script>
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import ElDragSelect from '@/components/DragSelect'
-import { fetchOperateLogList,deleteSelected,deleteLog,deleteAllOperateLog } from '@/api/log'
+import { queryOperateLogByPage,deleteSelectedOperateLog,deleteOperateLog,deleteAllOperateLog } from '@/api/log'
 export default {
   name: 'OperateIndex',
   components: { Pagination, ElDragSelect },
@@ -59,11 +59,10 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchOperateLogList(this.listQuery).then(response => {
+      queryOperateLogByPage(this.listQuery).then(response => {
         this.list = response.pageInfo.rows
         this.total = response.pageInfo.total
         this.listLoading = false
-        // console.logs(this.list)
       })
     },
     handleSelectionChange(val) {
@@ -73,18 +72,16 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
-    deleteSelected() {
-      // console.log(this.multipleSelection.length>0)
+    deleteSelectedOperateLog() {
       if(this.multipleSelection.length>0) {
         let selectedIds = this.getSelectedIds(this.multipleSelection)
-        // console.log(selectedIds)
         this.$confirm('确定删除已选择的记录吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteSelected(selectedIds).then(() => {
-            this.getList()
+          deleteSelectedOperateLog(selectedIds).then(() => {
+            this.handleFilter()
             this.$notify({
               title: '成功',
               message: '删除成功',
@@ -112,7 +109,7 @@ export default {
         type: 'warning'
       }).then(() => {
         deleteAllOperateLog().then(() => {
-          this.getList()
+          this.handleFilter()
           this.$notify({
             title: '成功',
             message: '删除成功',
@@ -127,14 +124,13 @@ export default {
         });
       });
     },
-    deleteLog(val) {
+    deleteOperateLog(val) {
       this.$confirm('确定删除该条记录吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // console.log(val.userId)
-        deleteLog(val.id).then(() => {
+        deleteAllOperateLog(val.id).then(() => {
           this.getList()
           this.$notify({
             title: '成功',

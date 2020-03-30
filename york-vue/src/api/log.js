@@ -1,24 +1,24 @@
 import request from '@/utils/request'
 
-export function fetchOperateLogList(query) {
+export function queryOperateLogByPage(query) {
   return request({
-    url: '/log/operate/page',
+    url: '/log/operate/queryOperateLogByPage',
     method: 'get',
     params: query
   })
 }
 
-export function deleteSelected(data) {
+export function deleteSelectedOperateLog(data) {
   return request({
-    url: '/log/operate/deleteSelected',
+    url: '/log/operate/deleteSelectedOperateLog',
     method: 'delete',
     data
   })
 }
 
-export function deleteLog(id) {
+export function deleteOperateLog(id) {
   return request({
-    url: '/log/operate/deleteLog',
+    url: '/log/operate/deleteOperateLog',
     method: 'delete',
     params: { id }
   })
@@ -31,17 +31,17 @@ export function deleteAllOperateLog() {
   })
 }
 
-export function fetchLoginLogList(query) {
+export function queryLoginLogByPage(query) {
   return request({
-    url: '/log/login/page',
+    url: '/log/login/queryLoginLogByPage',
     method: 'get',
     params: query
   })
 }
 
-export function fetchLogoutLogList(query) {
+export function queryLogoutLogByPage(query) {
   return request({
-    url: '/log/logout/page',
+    url: '/log/logout/queryLogoutLogByPage',
     method: 'get',
     params: query
   })
@@ -71,9 +71,9 @@ export function deleteSelectedLoginLog(data) {
   })
 }
 
-export function fetchTaskLogList(query) {
+export function queryTaskLogByPage(query) {
   return request({
-    url: '/log/task/page',
+    url: '/log/task/queryTaskLogByPage',
     method: 'get',
     params: query
   })

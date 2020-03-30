@@ -2,7 +2,7 @@
   <div class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">York</h3>
       </div>
       <el-form-item prop="username">
         <span class="svg-container">
@@ -11,7 +11,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="用户名"
           name="username"
           type="text"
           tabindex="1"
@@ -27,18 +27,18 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="Password"
+          placeholder="密码"
           name="password"
           tabindex="2"
           auto-complete="on"
           @keyup.enter.native="handleLogin"
         />
-        <span class="show-pwd" @click="showPwd">
+        <span class="show-pwd" @click="showPassword">
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
       <el-row type="flex" justify="center">
-        <el-button :loading="loading" type="primary" @click.native.prevent="handleLogin" style="width:100%">Login</el-button>
+        <el-button :loading="loading" type="primary" @click.native.prevent="handleLogin" style="width:100%">登录</el-button>
       </el-row>
     </el-form>
   </div>
@@ -78,7 +78,7 @@ export default {
     }
   },
   methods: {
-    showPwd() {
+    showPassword() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
       } else {

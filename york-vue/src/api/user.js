@@ -22,9 +22,9 @@ export function logout() {
   })
 }
 
-export function fetchList(query) {
+export function queryUserListByPage(query) {
   return request({
-    url: '/user/page',
+    url: '/user/queryUserListByPage',
     method: 'get',
     params: query
   })
@@ -32,25 +32,56 @@ export function fetchList(query) {
 
 export function updateUser(data) {
   return request({
-    url: '/user/update',
+    url: '/user/updateUser',
     method: 'put',
     data
   })
 }
 
-export function stopAndUse(userId,status) {
+export function stopOrUseUser(userSerial,status) {
   return request({
-    url: '/user/stopAndUse',
+    url: '/user/stopOrUseUser',
     method: 'put',
-    params: { userId,status }
+    params: { userSerial,status }
   })
 }
 
-export function deleteUser(userId) {
+export function deleteUserByUserSerial(userSerial) {
   return request({
-    url: '/user/deleteUser',
+    url: '/user/deleteUserByUserSerial',
     method: 'delete',
-    params: { userId }
+    params: { userSerial }
+  })
+}
+
+export function createUser(data) {
+  return request({
+    url: '/user/createUser',
+    method: 'post',
+    data
+  })
+}
+
+export function queryAllUserList() {
+  return request({
+    url: '/user/queryAllUserList',
+    method: 'get'
+  })
+}
+
+export function queryUserByDepartmentSerial(departmentSerial) {
+  return request({
+    url: '/user/queryUserByDepartmentSerial',
+    method: 'get',
+    params: { departmentSerial }
+  })
+}
+
+export function queryUserArrayByDepartmentSerial(departmentSerial) {
+  return request({
+    url: '/user/queryUserArrayByDepartmentSerial',
+    method: 'get',
+    params: { departmentSerial }
   })
 }
 

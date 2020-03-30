@@ -6,7 +6,7 @@ const applyRouter = {
   redirect: '/apply/leaveApply/leaveWaitApply',
   name: 'Apply',
   meta: {
-    title: 'apply',
+    title: '申请审批',
     icon: 'apply',
     roles: ['staff']
   },
@@ -15,20 +15,20 @@ const applyRouter = {
       path: 'leaveApply',
       component: () => import('@/views/apply/leaveApply/index'),
       name: 'LeaveApply',
-      meta: { title: 'leaveApply', noCache: true },
+      meta: { title: '请假流程申请', noCache: true },
       redirect: '/apply/leaveApply/leaveWaitApply',
       children: [
         {
           path: 'waitApply',
           component: () => import('@/views/apply/leaveApply/leaveWaitApply'),
           name: 'WaitApply',
-          meta: { title: 'waitApply' }
+          meta: { title: '待提交申请' }
         },
         {
-          path: 'applying',
-          component: () => import('@/views/apply/leaveApply/leaveApplying'),
-          name: 'Applying',
-          meta: { title: 'applying' }
+          path: 'waitApprove',
+          component: () => import('@/views/apply/leaveApply/leaveWaitApprove'),
+          name: 'WaitApprove',
+          meta: { title: '待审批申请' }
         }
       ]
     },
@@ -36,7 +36,13 @@ const applyRouter = {
       path: 'newApply',
       component: () => import('@/views/apply/newApply/index'),
       name: 'NewApply',
-      meta: {title: 'newApply', noCache: true}
+      meta: {title: '新建流程申请', noCache: true}
+    },
+    {
+      path: 'applying',
+      component: () => import('@/views/apply/applying/index'),
+      name: 'Applying',
+      meta: {title: '申请中流程', noCache: true}
     }
   ]
 }

@@ -2,35 +2,37 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.search" placeholder= "流程定义名搜索" style="width: 200px;" class="filter-item"/>
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ 'search' }}</el-button>
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ '搜索' }}</el-button>
     </div>
     <el-table
       :data="list"
       style="width: 100%"
       element-loading-text="拼命加载中"
       v-loading="listLoading">
-      <el-table-column label="Name" prop="processDefName"/>
-      <el-table-column label="Key" prop="processDefKey" width="100"/>
-      <el-table-column label="Version" prop="processDefVersion" width="100"/>
-      <el-table-column label="DeploymentId" prop="processDefDeploymentId" width="100"/>
-      <el-table-column label="ResourceName" prop="processDefResourceName"/>
-      <el-table-column label="DeploymentTime" prop="processDeployment.processDeploymentTime"/>
-      <el-table-column label="DeploymentName" prop="processDeployment.processDeploymentName" width="100"/>
+      <el-table-column label="流程定义Id" prop="processDefId" width="200" fixed/>
+      <el-table-column label="流程定义名称" prop="processDefName" width="200"/>
+      <el-table-column label="流程定义Key" prop="processDefKey" width="200"/>
+      <el-table-column label="流程定义描述" prop="processDefDescription" width="200"/>
+      <el-table-column label="流程定义版本" prop="processDefVersion" width="200"/>
+      <el-table-column label="流程定义部署id" prop="processDefDeploymentId" width="200"/>
+      <el-table-column label="流程定义源文件" prop="processDefResourceName" width="200"/>
+      <el-table-column label="流程定义部署名称" prop="processDeployment.processDeploymentName" width="200"/>
+      <el-table-column label="流程定义部署时间" prop="processDeployment.processDeploymentTime" width="200"/>
       <el-table-column
-        align="right">
+        align="right" width="300" fixed="right">
         <template slot-scope="scope">
           <el-button
             size="mini"
             type="danger"
-            @click="deleteProcessDef(scope.row)">Del</el-button>
+            @click="deleteProcessDef(scope.row)">删除</el-button>
             <el-button
               size="mini"
               type="danger"
-              @click="cascadeDeleteProcessDef(scope.row)">Cas</el-button>
+              @click="cascadeDeleteProcessDef(scope.row)">级联删除</el-button>
           <el-button
             size="mini"
             type="warning"
-            @click="deploy(scope.row)">Dep</el-button>
+            @click="deploy(scope.row)">部署</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -41,7 +43,7 @@
 <script>
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import ElDragSelect from '@/components/DragSelect'
-  import { getProcessDefList,deleteProcessDef,deploy,cascadeDeleteProcessDef } from '@/api/activity'
+  import { queryProcessDefListByPage,deleteProcessDef,deploy,cascadeDeleteProcessDef } from '@/api/activity'
   export default {
     name: 'ProcessDefIndex',
     components: { Pagination, ElDragSelect },
@@ -63,11 +65,10 @@
     methods: {
       getList() {
         this.listLoading = true
-        getProcessDefList(this.listQuery).then(response => {
+        queryProcessDefListByPage(this.listQuery).then(response => {
           this.list = response.pageInfo.rows
           this.total = response.pageInfo.total
           this.listLoading = false
-          // console.log(this.list)
         })
       },
       deleteProcessDef(val) {
@@ -76,7 +77,6 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          // console.log(val.processDefDeploymentId)
           deleteProcessDef(val.processDefDeploymentId).then(() => {
             this.getList()
             this.$notify({
@@ -99,7 +99,6 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          // console.log(val.processDefDeploymentId)
           cascadeDeleteProcessDef(val.processDefDeploymentId).then(() => {
             this.getList()
             this.$notify({
@@ -122,7 +121,6 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          // console.log(val.processDefResourceName)
           deploy(val.processDefResourceName,val.processDeployment.processDeploymentName).then(() => {
             this.getList()
             this.$notify({

@@ -2,178 +2,191 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.search" placeholder= "用户名搜索" style="width: 200px;" class="filter-item"/>
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ 'search' }}</el-button>
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ '搜索' }}</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ '新增' }}</el-button>
     </div>
     <el-table
       :data="list"
-      style="width: 100%">
-      <el-table-column type="expand">
-        <template slot-scope="props">
-          <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="Name:">
-              <span>{{ props.row.username }}</span>
-            </el-form-item>
-            <el-form-item label="Sex:">
-              <span>
-                <el-tag v-if="props.row.sex=='0'" :type="props.row.sex | sexFilter" size="small">Male</el-tag>
-                <el-tag v-if="props.row.sex=='1'" :type="props.row.sex| sexFilter" size="small">FeMale</el-tag>
-              </span>
-            </el-form-item>
-            <el-form-item label="Email:">
-              <span>{{ props.row.email }}</span>
-            </el-form-item>
-            <el-form-item label="avatar:">
-              <span>
-                 <img :src="props.row.avatar" width="40px" height="40px">
-              </span>
-            </el-form-item>
-            <el-form-item label="Tel:">
-              <span>{{ props.row.tel }}</span>
-            </el-form-item>
-            <el-form-item label="Status:">
-              <span>
-                <el-tag v-if="props.row.status=='0'" :type="props.row.status | statusFilter" size="small">Use</el-tag>
-                <el-tag v-if="props.row.status=='1'" :type="props.row.status| statusFilter" size="small">Stop</el-tag>
-                <el-tag v-if="props.row.status=='2'" :type="props.row.status| statusFilter" size="small">Wait</el-tag>
-              </span>
-            </el-form-item>
-            <el-form-item label="BornTime:">
-              <span>{{ props.row.born }}</span>
-            </el-form-item>
-            <el-form-item label="CreateTime:">
-              <span>{{ props.row.createTime }}</span>
-            </el-form-item>
-            <el-form-item label="CreateUser:">
-              <span>{{ props.row.createUser }}</span>
-            </el-form-item>
-            <el-form-item label="UpdateTime:">
-              <span>{{ props.row.updateTime }}</span>
-            </el-form-item>
-            <el-form-item label="UpdateUser:">
-              <span>{{ props.row.updateUser }}</span>
-            </el-form-item>
-            <el-form-item label="Roles:">
-              <el-tag
-                v-for="item in props.row.roles"
-                :key="item.roleId"
-                effect="dark" size="mini">
-                {{ item.roleName }}
-              </el-tag>
-            </el-form-item>
-          </el-form>
-        </template>
-      </el-table-column>
-      <el-table-column label="Name" prop="username" />
-      <el-table-column label="Email" prop="email" />
-      <el-table-column label="Tel" prop="tel" />
-      <el-table-column label="Born" prop="born" />
-      <el-table-column label="Sex" class-name="status-col" width="100">
+      style="width: 100%"
+      element-loading-text="拼命加载中"
+      v-loading="listLoading">
+      <el-table-column label="用户名" prop="username" fixed width="150"/>
+      <el-table-column label="Id" prop="userSerial" width="200"/>
+      <el-table-column label="邮箱地址" prop="email" width="200"/>
+      <el-table-column label="手机号码" prop="mobile" width="200"/>
+      <el-table-column label="出生日期" prop="born" width="200"/>
+      <el-table-column label="性别" class-name="status-col" width="150">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.sex=='0'" :type="scope.row.sex | sexFilter" >男</el-tag>
           <el-tag v-if="scope.row.sex=='1'" :type="scope.row.sex| sexFilter" >女</el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="状态" class-name="status-col"width="150">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status=='0'" :type="scope.row.status | statusFilter" >启用</el-tag>
+          <el-tag v-if="scope.row.status=='1'" :type="scope.row.status| statusFilter" >停用</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" prop="userCreateTime" width="200"/>
+      <el-table-column label="创建用户" prop="userCreateUser" width="150"/>
+      <el-table-column label="更新时间" prop="userUpdateTime" width="200"/>
+      <el-table-column label="更新用户" prop="userUpdateUser" width="150"/>
+      <el-table-column label="部门" prop="department.departmentName" width="200"/>
       <el-table-column
-        align="right">
+        align="right" width="250" fixed="right">
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="handleUpdate(scope.row)">Edit</el-button>
+            @click="handleUpdate(scope.row)">详情编辑</el-button>
           <el-button
             v-if="scope.row.status=='0'"
             size="mini"
             type="danger"
-            @click="stopAndUse(scope.row)">Stop</el-button>
+            @click="stopOrUseUser(scope.row)">停用</el-button>
           <el-button
             v-if="scope.row.status=='1'"
             size="mini"
             type="success"
-            @click="stopAndUse(scope.row)">Use</el-button>
-          <el-button
-            v-if="scope.row.status=='2'"
-            size="mini"
-            type="warning"
-            @click="activate(scope.row)">Act</el-button>
+            @click="stopOrUseUser(scope.row)">启用</el-button>
           <el-button
             size="mini"
             type="primary"
-            @click="deleteUser(scope.row)">Del</el-button>
+            @click="deleteUser(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+
     <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="'username'" prop="username" >
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" v-on:close="cancel">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 600px; margin-left:50px;" >
+        <el-form-item :label="'用户名'" prop="username" >
           <el-input v-model="temp.username"/>
         </el-form-item>
-        <el-form-item :label="'Email'" prop="userEmail">
+        <el-form-item :label="'邮箱'" prop="email">
           <el-input v-model="temp.email"/>
         </el-form-item>
-        <el-form-item :label="'Mobile'" prop="userMobile" >
-          <el-input v-model="temp.tel"/>
+        <el-form-item :label="'手机'" prop="mobile" >
+          <el-input v-model="temp.mobile"/>
         </el-form-item>
-        <el-form-item :label="'roles'">
-          <el-drag-select v-model="temp.roleArray" style="width:500px;" multiple placeholder="请选择">
-            <el-option v-for="item in roleList" :label="item.label" :value="item.value" :key="item.value" />
+        <el-form-item :label="'角色'">
+          <el-drag-select v-model="temp.roles" style="width:500px;" multiple placeholder="请选择">
+            <el-option v-for="item in roleList" :label="item.label" :value="item.value" />
           </el-drag-select>
         </el-form-item>
-        <el-form-item label="Born">
+        <el-form-item :label="'部门'">
+          <el-select v-model="temp.departmentSerial" placeholder="请选择">
+            <el-option
+              v-for="item in departmentList"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="'出生日期'">
           <el-date-picker v-model="temp.born" type="date" placeholder="Please pick a date" value-format="yyyy-MM-dd"/>
         </el-form-item>
-        <el-form-item label="Sex">
+        <el-form-item :label="'性别'">
           <el-radio-group v-model="temp.sex">
             <el-radio :label="0">男</el-radio>
             <el-radio :label="1">女</el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <div>
+              <el-form-item :label="'创建日期'" prop="userCreateTime" v-if="this.showFlag == 'true'" label-width="80px">
+                <el-input v-model="temp.userCreateTime" :disabled="true"/>
+              </el-form-item>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div>
+              <el-form-item :label="'创建用户'" prop="userCreateUser" v-if="this.showFlag == 'true'" label-width="80px">
+                <el-input v-model="temp.userCreateUser" :disabled="true"/>
+              </el-form-item>
+            </div>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <div>
+              <el-form-item :label="'更新日期'" prop="userUpdateTime" v-if="this.showFlag == 'true'" label-width="80px">
+                <el-input v-model="temp.userUpdateTime" :disabled="true"/>
+              </el-form-item>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div>
+              <el-form-item :label="'更新用户'" prop="userUpdateUser" v-if="this.showFlag == 'true'" label-width="80px">
+                <el-input v-model="temp.userUpdateUser" :disabled="true"/>
+              </el-form-item>
+            </div>
+          </el-col>
+        </el-row>
+        <el-form-item :label="'是否启用'" prop="status" v-if="this.showFlag == 'false'">
+          <el-switch
+            v-model="temp.status"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-value="0"
+            inactive-value="1">
+          </el-switch>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ 'cancel' }}</el-button>
-        <el-button type="primary" @click="updateData()">{{ 'confirm' }}</el-button>
+        <el-button @click="cancel">{{ '取消' }}</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createUser():updateUser()">{{ '确定' }}</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
+<script>
 
-<script>// Secondary package based on el-pagination
-
-import { fetchList,updateUser,stopAndUse,deleteUser } from '@/api/user'
+import { queryUserListByPage,stopOrUseUser,deleteUserByUserSerial,updateUser,createUser } from '@/api/user'
 import Pagination from '@/components/Pagination'
-import ElDragSelect from '@/components/DragSelect' // base on element-ui
-import { getRoles } from '@/api/role'
+import ElDragSelect from '@/components/DragSelect'
+import { queryRoleList } from '@/api/role'
+import { queryDepartmentList } from '@/api/department'
+
 export default {
   name: 'UserTable',
   components: { Pagination,ElDragSelect },
   data() {
     return {
-      list: null, // 获取列表展示集合
-      total: 0, // 获取列表展示记录数
+      listLoading: true,
+      list: null,
+      showFlag: 'true',
+      total: 0,
       listQuery: {
         page: 1,
-        limit: 10, // 默认每页显示10条
+        limit: 10,
         search: ''
       },
-      // 输入规则限制
       rules: {
-        username: [{ required: true, message: 'username is required', trigger: 'change' }]
       },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: '编辑',
+        create: '新增'
       },
       roleList: [],
-      // 拷贝到编辑页面的临时数据
+      departmentList: [],
       temp: {
-        userId: '',
+        userSerial: '',
         username: '',
         email: '',
-        tel: '',
+        mobile: '',
         born: '',
+        status: '1',
         sex: 0,
-        roleArray: []
+        roles: [],
+        userCreateTime: '',
+        userCreateUser: '',
+        userUpdateTime: '',
+        userUpdateUser: '',
+        departmentSerial: ''
       }
     }
   },
@@ -188,22 +201,21 @@ export default {
     statusFilter(status) {
       const statusMap = {
         0: 'success',
-        1: 'danger',
-        2: 'warning'
+        1: 'danger'
       }
       return statusMap[status]
     }
   },
   created() {
     this.getList()
-    this.getRoles()
   },
   methods: {
     getList() {
-      fetchList(this.listQuery).then(response => {
+      this.listLoading = true
+      queryUserListByPage(this.listQuery).then(response => {
         this.list = response.pageInfo.rows
         this.total = response.pageInfo.total
-        // console.logs(this.list)
+        this.listLoading = false
       })
     },
     handleFilter() {
@@ -211,34 +223,81 @@ export default {
       this.getList()
     },
     handleUpdate(row) {
-      // 每次编辑前清空temp.roles
-      // console.logs(row)
-      this.temp.roleArray = []
-      this.temp.userId = row.userId
+      this.showFlag = 'true'
+      this.getRoles()
+      this.getDepartments()
+      this.temp.roles = []
+      this.temp.userSerial = row.userSerial
       this.temp.username = row.username
       this.temp.email = row.email
-      this.temp.tel = row.tel
+      this.temp.mobile = row.mobile
       this.temp.born = row.born
       this.temp.sex = row.sex
+      this.temp.userCreateTime = row.userCreateTime
+      this.temp.userCreateUser = row.userCreateUser
+      this.temp.userUpdateUser = row.userUpdateUser
+      this.temp.userUpdateTime = row.userUpdateTime
+      if(row.department!==null){
+        this.temp.departmentSerial = row.department.departmentSerial
+      }
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
-      for (const item of row.roles) {
-        // 用item操作每一条数据。
-        this.temp.roleArray.push(item.roleId)
+      for (const item of row.roleList) {
+        this.temp.roles.push(item.roleSerial)
       }
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    handleCreate() {
+      this.showFlag = 'false'
+      this.getRoles()
+      this.getDepartments()
+      this.temp = {
+        userSerial: '',
+        username: '',
+        email: '',
+        mobile: '',
+        born: '',
+        sex: 0,
+        status: '1',
+        roles: [],
+        userCreateTime: '',
+        userCreateUser: '',
+        userUpdateTime: '',
+        userUpdateUser: '',
+        departmentSerial: ''
+      }
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
     getRoles() {
-      getRoles().then(response => {
+      queryRoleList().then(response => {
         response.list.forEach(item => {
           this.roleList.push({
-            value: item.roleId,
+            value: item.roleSerial,
             label: item.roleName
           })
         })
       })
+    },
+    getDepartments() {
+      queryDepartmentList().then(response => {
+        response.list.forEach(item => {
+          this.departmentList.push({
+            value: item.departmentSerial,
+            label: item.departmentName
+          })
+        })
+      })
+    },
+    cancel() {
+      this.dialogFormVisible = false
+      this.roleList = []
+      this.departmentList = []
     },
     deleteUser(val){
       this.$confirm('确定删除该用户吗？', '提示', {
@@ -246,8 +305,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteUser(val.userId).then(() => {
-          this.getList()
+        deleteUserByUserSerial(val.userSerial).then(() => {
+          this.handleFilter()
           this.$notify({
             title: '成功',
             message: '删除成功',
@@ -262,13 +321,13 @@ export default {
         });
       });
     },
-    stopAndUse(val) {
+    stopOrUseUser(val) {
       this.$confirm('确定要停用/启用该用户吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        stopAndUse(val.userId,val.status).then(() => {
+        stopOrUseUser(val.userSerial,val.status).then(() => {
           this.getList()
           this.$notify({
             title: '成功',
@@ -284,12 +343,28 @@ export default {
         });
       });
     },
-    updateData() {
+    createUser() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          createUser(this.temp).then(() => {
+            this.dialogFormVisible = false
+            this.handleFilter()
+            this.$notify({
+              title: '成功',
+              message: '创建成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    updateUser() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           updateUser(tempData).then(() => {
-            this.getList()
+            this.handleFilter()
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',
@@ -308,9 +383,6 @@ export default {
 </script>
 
 <style scoped>
-  .demo-table-expand {
-    font-size: 0;
-  }
   .demo-table-expand label {
     width: 90px;
     color: #99a9bf;
@@ -329,18 +401,5 @@ export default {
   }
   .avatar-uploader .el-upload:hover {
     border-color: #409EFF;
-  }
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
-    text-align: center;
-  }
-  .avatar {
-    width: 178px;
-    height: 178px;
-    display: block;
   }
 </style>

@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function getProcessDefList(query) {
+export function queryProcessDefListByPage(query) {
   return request({
-    url: '/activity/processDef/page',
+    url: '/activity/processDef/queryProcessDefListByPage',
     method: 'get',
     params: query
   })

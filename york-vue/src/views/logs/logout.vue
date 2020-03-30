@@ -2,8 +2,8 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.search" placeholder= "登出名搜索" style="width: 200px;" class="filter-item"/>
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ 'search' }}</el-button>
-      <el-button class="filter-item" type="danger" icon="el-icon-delete" @click="deleteSelected">{{ 'delete' }}</el-button>
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ '搜索' }}</el-button>
+      <el-button class="filter-item" type="danger" icon="el-icon-delete" @click="deleteSelected">{{ '删除' }}</el-button>
     </div>
     <el-table
       @selection-change="handleSelectionChange"
@@ -14,13 +14,13 @@
       v-loading="listLoading">
       <el-table-column type="selection" align="center"/>
       <el-table-column
-        label="Name"
+        label="登出用户"
         prop="logoutUsername"/>
       <el-table-column
-        label="Ip"
+        label="登出Ip"
         prop="logoutIp"/>
       <el-table-column
-        label="LogoutTime"
+        label="登出时间"
         prop="logoutTime"/>
       <el-table-column
         align="center">
@@ -28,7 +28,7 @@
           <el-button
             size="mini"
             type="danger"
-            @click="deleteLogoutLog(scope.row)">Del</el-button>
+            @click="deleteLogoutLog(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -37,9 +37,9 @@
 </template>
 
 <script>
-import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import Pagination from '@/components/Pagination'
 import ElDragSelect from '@/components/DragSelect'
-import { fetchLogoutLogList,deleteLogoutLog,deleteSelectedLogoutLog } from '@/api/log'
+import { queryLogoutLogByPage,deleteLogoutLog,deleteSelectedLogoutLog } from '@/api/log'
 export default {
   name: 'LogoutIndex',
   components: { Pagination, ElDragSelect },
@@ -62,11 +62,10 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchLogoutLogList(this.listQuery).then(response => {
+      queryLogoutLogByPage(this.listQuery).then(response => {
         this.list = response.pageInfo.rows
         this.total = response.pageInfo.total
         this.listLoading = false
-        // console.log(this.list)
       })
     },
     deleteLogoutLog(val) {
@@ -75,7 +74,6 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // console.log(val.userId)
         deleteLogoutLog(val.logoutId).then(() => {
           this.getList()
           this.$notify({
@@ -109,17 +107,15 @@ export default {
       }
     },
     deleteSelected() {
-      // console.log(this.multipleSelection.length>0)
       if(this.multipleSelection.length>0) {
         let selectedIds = this.getSelectedIds(this.multipleSelection)
-        // console.log(selectedIds)
         this.$confirm('确定删除已选择的记录吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           deleteSelectedLogoutLog(selectedIds).then(() => {
-            this.getList()
+            this.handleFilter()
             this.$notify({
               title: '成功',
               message: '删除成功',
