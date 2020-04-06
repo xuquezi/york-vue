@@ -23,6 +23,14 @@ export function getLeaveWaitApplyList(query) {
   })
 }
 
+export function queryLeaveBackApplyListByPage(query) {
+  return request({
+    url: '/apply/queryLeaveBackApplyListByPage/page',
+    method: 'get',
+    params: query
+  })
+}
+
 export function applyLeaveProcess(data) {
   return request({
     url: '/apply/applyLeaveProcess',
@@ -31,35 +39,51 @@ export function applyLeaveProcess(data) {
   })
 }
 
-export function cancelProcess(processTaskId) {
+export function cancelProcess(taskId) {
   return request({
     url: '/apply/cancelProcess',
     method: 'put',
-    params: { processTaskId }
+    params: { taskId }
   })
 }
 
-export function fetchApplyingList(query) {
+export function queryProcess(processDefinitionId,processInstanceId) {
   return request({
-    url: '/apply/getApplyingList/page',
+    url: '/apply/queryProcess',
+    method: 'get',
+    params: { processDefinitionId,processInstanceId }
+  })
+}
+
+export function queryApplyingListByPage(query) {
+  return request({
+    url: '/apply/queryApplyingListByPage/page',
     method: 'get',
     params: query
   })
 }
 
-export function getLeaveWaitApproveList(query) {
+export function queryCancelApplyListByPage(query) {
   return request({
-    url: '/apply/getLeaveWaitApproveList/page',
+    url: '/apply/queryCancelApplyListByPage/page',
     method: 'get',
     params: query
   })
 }
 
-export function getLeaveApplyData(processTaskInstanceId,processTaskDefinitionId) {
+export function queryLeaveWaitApproveListByPage(query) {
+  return request({
+    url: '/apply/queryLeaveWaitApproveListByPage/page',
+    method: 'get',
+    params: query
+  })
+}
+
+export function getLeaveApplyData(taskInstanceId,taskDefinitionId) {
   return request({
     url: '/apply/getLeaveApplyData',
     method: 'get',
-    params: { processTaskInstanceId,processTaskDefinitionId }
+    params: { taskInstanceId,taskDefinitionId }
   })
 }
 

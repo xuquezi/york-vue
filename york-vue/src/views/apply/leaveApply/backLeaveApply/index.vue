@@ -57,7 +57,7 @@
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import { mapGetters } from 'vuex'
   import ElDragSelect from '@/components/DragSelect'
-  import { getLeaveWaitApplyList,applyLeaveProcess,cancelProcess } from '@/api/apply'
+  import { queryLeaveBackApplyListByPage,applyLeaveProcess,cancelProcess } from '@/api/apply'
   export default {
     name: 'WaitApplyIndex',
     components: { Pagination, ElDragSelect },
@@ -104,7 +104,7 @@
     methods: {
       getList() {
         this.listLoading = true
-        getLeaveWaitApplyList(this.listQuery).then(response => {
+        queryLeaveBackApplyListByPage(this.listQuery).then(response => {
           this.list = response.pageInfo.rows
           this.total = response.pageInfo.total
           this.listLoading = false

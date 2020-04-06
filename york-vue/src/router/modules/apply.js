@@ -6,7 +6,7 @@ const applyRouter = {
   redirect: '/apply/leaveApply/leaveWaitApply',
   name: 'Apply',
   meta: {
-    title: '申请审批',
+    title: '申请管理',
     icon: 'apply',
     roles: ['staff']
   },
@@ -25,10 +25,10 @@ const applyRouter = {
           meta: { title: '待提交申请' }
         },
         {
-          path: 'waitApprove',
-          component: () => import('@/views/apply/leaveApply/leaveWaitApprove'),
-          name: 'WaitApprove',
-          meta: { title: '待审批申请' }
+          path: 'backApply',
+          component: () => import('@/views/apply/leaveApply/backLeaveApply'),
+          name: 'BackApply',
+          meta: { title: '被退回申请' }
         }
       ]
     },
@@ -43,6 +43,12 @@ const applyRouter = {
       component: () => import('@/views/apply/applying/index'),
       name: 'Applying',
       meta: {title: '申请中流程', noCache: true}
+    },
+    {
+      path: 'cancelApply',
+      component: () => import('@/views/apply/cancelApply/index'),
+      name: 'CancelApply',
+      meta: {title: '被取消流程', noCache: true}
     }
   ]
 }

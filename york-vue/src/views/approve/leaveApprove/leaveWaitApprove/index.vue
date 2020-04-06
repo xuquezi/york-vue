@@ -1,28 +1,24 @@
 <template>
   <div class="app-container">
-    <div class="filter-container">
-      <el-input v-model="listQuery.search" placeholder= "流程名搜索" style="width: 200px;" class="filter-item"/>
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ 'search' }}</el-button>
-    </div>
     <el-table
       :data="list"
       style="width: 100%"
       element-loading-text="拼命加载中"
       v-loading="listLoading">
-      <el-table-column label="Id" prop="processTaskId"/>
-      <el-table-column label="Name" prop="processTaskName"/>
-      <el-table-column label="CreateTime" prop="processTaskCreateTime"/>
-      <el-table-column label="DefinitionId" prop="processTaskDefinitionId"/>
-      <el-table-column label="InstanceId" prop="processTaskInstanceId"/>
-      <el-table-column label="Assignee" prop="processTaskAssignee"/>
-      <el-table-column label="AssigneeName" prop="processTaskAssigneeName"/>
+      <el-table-column label="任务Id" prop="taskId" width="150" fixed/>
+      <el-table-column label="任务名称" prop="taskName" width="200"/>
+      <el-table-column label="任务创建时间" prop="taskCreateTime" width="200"/>
+      <el-table-column label="流程定义Id" prop="taskDefinitionId" width="200"/>
+      <el-table-column label="流程实例Id" prop="taskInstanceId" width="200"/>
+      <el-table-column label="当前处理人id" prop="taskAssignee" width="200"/>
+      <el-table-column label="当前处理人名称" prop="taskAssigneeName" width="200"/>
       <el-table-column
-        align="center">
+        align="center" fixed="right" width="200">
         <template slot-scope="scope">
           <el-button
             size="mini"
             type="danger"
-            @click="handleApprove(scope.row)">Approve</el-button>
+            @click="handleApprove(scope.row)">审批</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -31,41 +27,41 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" v-on:close="cancelApprove">
       <el-form ref="dataForm" :model="applyData" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="'ApplyUser'" prop="leaveApplyUserId" >
-          <el-input v-model="applyData.leaveApplyUserId" :disabled="true"/><!--绑定的是用户的name来自getter-->
+        <el-form-item :label="'申请用户Id'" prop="leaveApplyUserId" >
+          <el-input v-model="applyData.leaveApplyUserId" :disabled="true"/>
         </el-form-item>
-        <el-form-item :label="'ApplyName'" prop="leaveApplyUsername" >
-          <el-input v-model="applyData.leaveApplyUsername" :disabled="true"/><!--绑定的是用户的name来自getter-->
+        <el-form-item :label="'申请用户'" prop="leaveApplyUsername" >
+          <el-input v-model="applyData.leaveApplyUsername" :disabled="true"/>
         </el-form-item>
-        <el-form-item :label="'ApplyTime'" prop="leaveApplyTime" >
-          <el-input v-model="applyData.leaveApplyTime" :disabled="true"/><!--绑定的是用户的name来自getter-->
+        <el-form-item :label="'申请时间'" prop="leaveApplyTime" >
+          <el-input v-model="applyData.leaveApplyTime" :disabled="true"/>
         </el-form-item>
-        <el-form-item :label="'ApplyRemark'" prop="leaveApplyRemark" >
-          <el-input v-model="applyData.leaveApplyRemark" :disabled="true"/><!--绑定的是用户的name来自getter-->
+        <el-form-item :label="'申请描述'" prop="leaveApplyRemark" >
+          <el-input v-model="applyData.leaveApplyRemark" :disabled="true"/>
         </el-form-item>
-        <el-form-item :label="'ApplyDays'" prop="leaveApplyDays" >
-          <el-input v-model="applyData.leaveApplyDays" :disabled="true"/><!--绑定的是用户的name来自getter-->
+        <el-form-item :label="'请假天数'" prop="leaveApplyDays" >
+          <el-input v-model="applyData.leaveApplyDays" :disabled="true"/>
         </el-form-item>
-        <el-form-item :label="'ApplyDepart'" prop="leaveApplyDepartmentName" >
-          <el-input v-model="applyData.leaveApplyDepartmentName" :disabled="true"/><!--绑定的是用户的name来自getter-->
+        <el-form-item :label="'用户部门'" prop="leaveApplyDepartmentName" >
+          <el-input v-model="applyData.leaveApplyDepartmentName" :disabled="true"/>
         </el-form-item>
-        <el-form-item :label="'Opinion'" prop="approveOpinion" >
+        <el-form-item :label="'审批意见'" prop="approveOpinion" >
           <el-input v-model="approveData.approveRemark" type="textarea"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="cancelApprove()">{{ 'cancel' }}</el-button>
-        <el-button type="primary" @click="agreeLeaveApply()">{{ 'agree' }}</el-button>
-        <el-button type="warning" @click="backLeaveApply()">{{ 'back' }}</el-button>
+        <el-button @click="cancelApprove()">{{ '取消' }}</el-button>
+        <el-button type="primary" @click="agreeLeaveApply()">{{ '同意' }}</el-button>
+        <el-button type="warning" @click="backLeaveApply()">{{ '退回' }}</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-  import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+  import Pagination from '@/components/Pagination'
   import ElDragSelect from '@/components/DragSelect'
-  import { getLeaveWaitApproveList,getLeaveApplyData,agreeLeaveApply,backLeaveApply } from '@/api/apply'
+  import { queryLeaveWaitApproveListByPage,getLeaveApplyData,agreeLeaveApply,backLeaveApply } from '@/api/apply'
   export default {
     name: 'WaitApproveIndex',
     components: { Pagination, ElDragSelect },
@@ -101,7 +97,6 @@
         listQuery: {
           page: 1,
           limit: 10,
-          search: '',
           // 这个是固定值，根据流程定义写死
           processType: 'LeaveProcess'
         }
@@ -113,7 +108,7 @@
     methods: {
       getList() {
         this.listLoading = true
-        getLeaveWaitApproveList(this.listQuery).then(response => {
+        queryLeaveWaitApproveListByPage(this.listQuery).then(response => {
           this.list = response.pageInfo.rows
           this.total = response.pageInfo.total
           this.listLoading = false
@@ -160,7 +155,7 @@
       handleApprove(row) {
         this.dialogStatus = 'approve'
         this.dialogFormVisible = true
-        getLeaveApplyData(row.processTaskInstanceId,row.processTaskDefinitionId).then(response => {
+        getLeaveApplyData(row.taskInstanceId,row.taskDefinitionId).then(response => {
           this.applyData.leaveApplyUserId = response.leaveApply.leaveApplyUserId
           this.applyData.leaveApplyUsername = response.leaveApply.leaveApplyUsername
           this.applyData.leaveApplyTime = response.leaveApply.leaveApplyTime
@@ -168,9 +163,9 @@
           this.applyData.leaveApplyDays = response.leaveApply.leaveApplyDays
           this.applyData.leaveApplyId = response.leaveApply.leaveApplyId
           this.applyData.leaveApplyDepartmentName = response.leaveApply.leaveApplyDepartmentName
-          this.applyData.processTaskId = response.leaveApply.processTaskId
+          this.applyData.processTaskId = response.leaveApply.taskId
           // leaveApply里面存的processTaskId是申请时候的，审批时候的已经更新了
-          this.approveData.processTaskId = row.processTaskId
+          this.approveData.processTaskId = row.taskId
         })
       },
       handleFilter() {
