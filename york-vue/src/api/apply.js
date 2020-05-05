@@ -71,9 +71,9 @@ export function queryCancelApplyListByPage(query) {
   })
 }
 
-export function queryLeaveWaitApproveListByPage(query) {
+export function queryFinishApplyListByPage(query) {
   return request({
-    url: '/apply/queryLeaveWaitApproveListByPage/page',
+    url: '/apply/queryFinishApplyListByPage/page',
     method: 'get',
     params: query
   })
@@ -87,20 +87,4 @@ export function getLeaveApplyData(taskInstanceId,taskDefinitionId) {
   })
 }
 
-// 一定要是data，写死不然传不过去数据
-export function agreeLeaveApply(data) {
-  return request({
-    url: '/apply/agreeLeaveApply',
-    method: 'put',
-    data
-  })
-}
-
-export function backLeaveApply(data) {
-  return request({
-    url: '/apply/backLeaveApply',
-    method: 'put',
-    data
-  })
-}
 

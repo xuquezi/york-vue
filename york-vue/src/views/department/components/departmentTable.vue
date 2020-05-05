@@ -14,7 +14,7 @@
       <el-table-column label="部门名称" prop="departmentName" width="200"/>
       <el-table-column label="部门描述" prop="departmentDesc" width="250"/>
       <el-table-column label="部门级别" prop="departmentLevel" width="150"/>
-      <el-table-column label="部门管理人" prop="userInfo.username" width="150"/>
+      <el-table-column label="部门管理人" prop="managerUsername" width="150"/>
       <el-table-column label="创建时间" prop="departmentCreateTime" width="200"/>
       <el-table-column label="创建用户" prop="departmentCreateUser" width="150"/>
       <el-table-column label="更新时间" prop="departmentUpdateTime" width="200"/>
@@ -28,7 +28,7 @@
           <el-button
             size="mini"
             type="warning"
-            @click="departmentUserEdit(scope.row)">部门员工编辑</el-button>
+            @click="departmentUserQuery(scope.row)">部门员工查看</el-button>
           <el-button
             size="mini"
             type="primary"
@@ -39,11 +39,11 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" v-on:close="resetData">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px" style="width: 600px; margin-left:50px;">
-        <el-form-item label="部门名称" >
+      <el-form ref="dataForm" :model="temp" label-position="left" label-width="100px" style="width: 600px; margin-left:50px;" :rules="rules">
+        <el-form-item label="部门名称" prop="departmentName">
         <el-input v-model="temp.departmentName"/>
         </el-form-item>
-        <el-form-item label="部门描述" >
+        <el-form-item label="部门描述" prop="departmentDesc">
           <el-input v-model="temp.departmentDesc"/>
         </el-form-item>
         <el-form-item label="部门管理人" v-if="this.showFlag == 'true'">
@@ -51,12 +51,12 @@
             <el-option v-for="item in userOptions" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="部门级别">
+        <el-form-item label="部门级别" prop="departmentLevel">
           <el-select v-model="temp.departmentLevel" class="filter-item" placeholder="请选择" v-on:change="queryDepartmentByParentLevel" >
             <el-option v-for="item in levelOptions" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="上级部门" v-if="this.parentDepartmentShowFlag == 'true'">
+        <el-form-item label="上级部门" v-if="this.parentDepartmentShowFlag == 'true'" prop="parentDepartment">
           <el-select v-model="temp.parentDepartmentSerial" class="filter-item" placeholder="请选择" >
             <el-option v-for="item in parentOptions" :label="item.label" :value="item.value" :key="item.value" />
           </el-select>
@@ -100,18 +100,17 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="部门员工编辑" :visible.sync="userEditDialogVisible" v-on:close="cancelEditDepartmentUser">
-      <el-form ref="departmentUserForm" :model="transferData" label-position="left" label-width="100px" style="width: 500px; margin-left:100px;">
-        <el-transfer
-          v-model="transferData.departmentUserList"
-          :data="transferData.allUser"
-          :titles="['用户', '部门']">
-        </el-transfer>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="cancelEditDepartmentUser">{{ '取消编辑' }}</el-button>
-        <el-button type="primary" @click="editDepartmentUser()">{{ '确认编辑' }}</el-button>
-      </div>
+    <el-dialog title="部门员工列表" :visible.sync="userDepartmentDialogVisible" v-on:close="cancelDepartmentUser">
+      <el-table :data="departmentUserList" align="center">
+        <el-table-column property="username" label="用户名" width="200" />
+        <el-table-column label="状态" class-name="status-col" width="200" >
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.status=='0'" :type="scope.row.status | statusFilter" >启用</el-tag>
+            <el-tag v-if="scope.row.status=='1'" :type="scope.row.status| statusFilter" >停用</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column property="department.departmentName" label="用户部门" width="200" />
+      </el-table>
     </el-dialog>
   </div>
 </template>
@@ -119,40 +118,74 @@
 <script>
   import Pagination from '@/components/Pagination'
   import ElDragSelect from '@/components/DragSelect'
-  import { queryDepartmentListByPage,queryDepartmentLevel,queryDepartmentByParentLevel,createDepartment,updateDepartment,editDepartmentUser } from '@/api/department'
-  import { queryAllUserList,queryUserByDepartmentSerial,queryUserArrayByDepartmentSerial } from '@/api/user'
+  import { queryDepartmentListByPage,queryDepartmentLevel,queryDepartmentByParentLevel,createDepartment,updateDepartment,deleteDepartmentByDepartmentSerial,departmentUserQuery } from '@/api/department'
+  import { queryUserByDepartmentSerial } from '@/api/user'
+  import { validDepartmentName } from '@/api/validate'
+
   export default {
     name: 'DepartmentTable',
     components: { Pagination, ElDragSelect },
     data() {
-      const queryAllUser = _ => {
-        const allUser = [];
-        queryAllUserList().then(response=> {
-          response.list.forEach(item => {
-            allUser.push({
-              key: item.userSerial,
-              label: item.username,
-            });
+      const validateDepartmentName = (rule, value, callback) => {
+        if(!value) {
+          callback(new Error('部门名称不能为空！'))
+        }
+        else if (value.length < 2 || value.length > 15){
+          callback(new Error('部门名称长度需要控制在在3到15之间！'))
+        }
+        else if (!this.validateFlag) {
+          callback()
+        }
+        else{
+          validDepartmentName(value).then(response => {
+            let flag = response.flag
+            if(!flag){
+              callback(new Error('部门名称已存在！'))
+            }
+            callback()
           })
-        })
-        return allUser
-      };
+        }
+      }
+      const validateParentDepartment = (rule, value, callback) => {
+        if (!this.temp.parentDepartmentSerial) {
+          callback(new Error('请选择上级部门！'))
+        }
+        else {
+          callback()
+        }
+      }
       return {
+        // 校验标志
+        validateFlag: true,
+        // 加载
         listLoading: true,
+        // 查询数据总数
         total: 0,
+        // 页面展示list集合
         list: null,
-        userEditDialogVisible: false,
+        // 部门用户dialog是否显示
+        userDepartmentDialogVisible: false,
+        // 编辑新增页面是否显示
         dialogFormVisible: false,
+        // dialog create or update
         dialogStatus: '',
+        // 是否展示上级部门选择框
         parentDepartmentShowFlag: 'false',
+        // 是否在编辑新增页面显示新增日期，创建日期等输入框（新增不显示，编辑的时候显示）
         showFlag: 'true',
+        // 编辑 or 新增
         textMap: {
           update: '编辑',
           create: '新增'
         },
+        departmentUserList: null,
+        // 部门级别数组
         levelOptions: [],
+        // 上级部门的数组
         parentOptions: [],
+        // 部门员工数组
         userOptions: [],
+        // 用于编辑的临时数据
         temp: {
           departmentSerial: '',
           departmentName: '',
@@ -165,17 +198,36 @@
           departmentUpdateUser: '',
           managerUserSerial: ''
         },
-        transferData: {
-          allUser: queryAllUser(),
-          departmentUserList: [],
-          departmentSerial: ''
-
+        // 校验规则
+        rules: {
+          departmentName: [
+            { required: true,validator: validateDepartmentName, trigger: 'blur' }
+          ],
+          departmentLevel: [
+            { required: true,message: '请选择部门级别！', trigger: 'change' }
+          ],
+          departmentDesc: [
+            { required: true,message: '请输入部门描述！', trigger: 'blur' }
+          ],
+          parentDepartment: [
+            { required: true,validator: validateParentDepartment, trigger: 'change' }
+          ]
         },
+        // 查询条件封装
         listQuery: {
           page: 1,
           limit: 10,
           search: ''
         }
+      }
+    },
+    filters: {
+      statusFilter(status) {
+        const statusMap = {
+          0: 'success',
+          1: 'danger',
+        }
+        return statusMap[status]
       }
     },
     created() {
@@ -210,17 +262,8 @@
         this.parentOptions = []
         this.userOptions = []
       },
-      handleUpdate(row) {
-        this.showFlag = 'true'
-        this.queryDepartmentLevel()
-        this.temp.departmentSerial = row.departmentSerial
-        this.temp.departmentName = row.departmentName
-        this.temp.departmentDesc = row.departmentDesc
+      queryParentDepartment(row) {
         this.temp.departmentLevel = row.departmentLevel
-        if(row.userInfo!==null) {
-          this.temp.managerUserSerial = row.userInfo.userSerial
-        }
-        this.parentDepartmentShowFlag = 'true'
         queryDepartmentByParentLevel(this.temp.departmentLevel).then(response=> {
           response.list.forEach(item => {
             this.parentOptions.push({
@@ -229,6 +272,9 @@
             })
           })
         })
+      },
+      queryUserOptionsByDepartmentSerial(row){
+        this.temp.departmentSerial = row.departmentSerial
         queryUserByDepartmentSerial(this.temp.departmentSerial).then(response=> {
           response.list.forEach(item => {
             this.userOptions.push({
@@ -237,17 +283,38 @@
             })
           })
         })
+      },
+      handleUpdate(row) {
+        this.queryDepartmentLevel()
+        this.handleUpdateData(row)
+        this.queryParentDepartment(row)
+        this.queryUserOptionsByDepartmentSerial(row)
+      },
+      handleUpdateData(row) {
+        this.temp.departmentName = row.departmentName
+        this.temp.departmentDesc = row.departmentDesc
         this.temp.parentDepartmentSerial = row.parentDepartmentSerial
         this.temp.departmentCreateUser = row.departmentCreateUser
         this.temp.departmentCreateTime = row.departmentCreateTime
         this.temp.departmentUpdateTime = row.departmentUpdateTime
         this.temp.departmentUpdateUser = row.departmentUpdateUser
+        if(row.managerUserSerial!==null) {
+          this.temp.managerUserSerial = row.managerUserSerial
+        }
+        this.validateFlag = false
+        this.showFlag = 'true'
+        this.parentDepartmentShowFlag = 'true'
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
       },
       handleCreate() {
         this.queryDepartmentLevel()
-        this.showFlag = 'false'
+        this.handleCreateData()
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
+      },
+      handleCreateData() {
         this.temp = {
           departmentSerial: '',
           departmentName: '',
@@ -260,11 +327,10 @@
           departmentUpdateTime: '',
           departmentUpdateUser: ''
         }
+        this.validateFlag = true
+        this.showFlag = 'false'
         this.dialogStatus = 'create'
         this.dialogFormVisible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].clearValidate()
-        })
       },
       queryDepartmentLevel() {
         queryDepartmentLevel().then(response => {
@@ -299,14 +365,11 @@
           }
         })
       },
-      departmentUserEdit(row) {
-        this.transferData.departmentSerial = row.departmentSerial
-        queryUserArrayByDepartmentSerial(row.departmentSerial).then(response=> {
-          if(response.array!==null){
-            this.transferData.departmentUserList = response.array;
-          }
+      departmentUserQuery(row) {
+        this.userDepartmentDialogVisible = true
+        departmentUserQuery(row.departmentSerial).then(response => {
+          this.departmentUserList = response.list
         })
-        this.userEditDialogVisible = true
       },
       createData() {
         this.$refs['dataForm'].validate((valid) => {
@@ -324,31 +387,31 @@
           }
         })
       },
-      cancelEditDepartmentUser() {
-        this.userEditDialogVisible = false
-        this.transferData.departmentSerial = ''
-        this.transferData.departmentUserList = []
+      cancelDepartmentUser() {
+        this.departmentUserList = null
+        this.userDepartmentDialogVisible = false
       },
-      editDepartmentUser() {
-        this.$refs['departmentUserForm'].validate((valid) => {
-          if (valid) {
-            editDepartmentUser(this.transferData).then(() => {
-              this.userEditDialogVisible = false
-              this.handleFilter()
-              this.$notify({
-                title: '成功',
-                message: '修改成功',
-                type: 'success',
-                duration: 2000
-              })
-            }).catch(() => {
-              this.cancelEditDepartmentUser()
-            });
-          }
-        })
-
-      },
-      deleteDepartment() {
+      deleteDepartment(row) {
+        this.$confirm('确定删除该部门吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteDepartmentByDepartmentSerial(row.departmentSerial).then(() => {
+            this.handleFilter()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
       }
     }
   }

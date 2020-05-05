@@ -62,13 +62,6 @@ export function createUser(data) {
   })
 }
 
-export function queryAllUserList() {
-  return request({
-    url: '/user/queryAllUserList',
-    method: 'get'
-  })
-}
-
 export function queryUserByDepartmentSerial(departmentSerial) {
   return request({
     url: '/user/queryUserByDepartmentSerial',
@@ -77,11 +70,4 @@ export function queryUserByDepartmentSerial(departmentSerial) {
   })
 }
 
-export function queryUserArrayByDepartmentSerial(departmentSerial) {
-  return request({
-    url: '/user/queryUserArrayByDepartmentSerial',
-    method: 'get',
-    params: { departmentSerial }
-  })
-}
 

@@ -1,6 +1,4 @@
-/**
- * Created by PanJiaChen on 16/11/18.
- */
+import { validateUsername,validateEmail } from '@/api/validate'
 
 /**
  * @param {string} path
@@ -9,3 +7,4 @@
 export function isExternal(path) {
   return /^(https?:|mailto:|tel:)/.test(path)
 }
+

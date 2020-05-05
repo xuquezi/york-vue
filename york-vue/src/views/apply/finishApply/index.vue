@@ -47,9 +47,9 @@
 <script>
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import ElDragSelect from '@/components/DragSelect'
-  import { queryApplyingListByPage,queryProcess } from '@/api/apply'
+  import { queryFinishApplyListByPage,queryProcess } from '@/api/apply'
   export default {
-    name: 'ApplyingIndex',
+    name: 'CancelApplyIndex',
     components: { Pagination, ElDragSelect },
     data() {
       return {
@@ -68,13 +68,9 @@
       this.getList()
     },
     methods: {
-      getList() {
-        this.listLoading = true
-        queryApplyingListByPage(this.listQuery).then(response => {
-          this.list = response.pageInfo.rows
-          this.total = response.pageInfo.total
-          this.listLoading = false
-        })
+      closeDialog() {
+        this.taskList = []
+        this.flowDetailVisible = false
       },
       queryProcess(row) {
         queryProcess(row.processDefinitionId,row.processInstanceId).then(response=> {
@@ -82,9 +78,13 @@
           this.flowDetailVisible = true
         })
       },
-      closeDialog() {
-        this.taskList = []
-        this.flowDetailVisible = false
+      getList() {
+        this.listLoading = true
+        queryFinishApplyListByPage(this.listQuery).then(response => {
+          this.list = response.pageInfo.rows
+          this.total = response.pageInfo.total
+          this.listLoading = false
+        })
       }
     }
   }

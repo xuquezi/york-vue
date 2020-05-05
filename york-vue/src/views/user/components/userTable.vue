@@ -69,18 +69,14 @@
         <el-form-item :label="'手机'" prop="mobile" >
           <el-input v-model="temp.mobile"/>
         </el-form-item>
-        <el-form-item :label="'角色'">
+        <el-form-item :label="'角色'" prop="roles">
           <el-drag-select v-model="temp.roles" style="width:500px;" multiple placeholder="请选择">
             <el-option v-for="item in roleList" :label="item.label" :value="item.value" />
           </el-drag-select>
         </el-form-item>
-        <el-form-item :label="'部门'">
+        <el-form-item :label="'部门'" prop="department">
           <el-select v-model="temp.departmentSerial" placeholder="请选择">
-            <el-option
-              v-for="item in departmentList"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
+            <el-option v-for="item in departmentList" :label="item.label" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item :label="'出生日期'">
@@ -144,6 +140,7 @@
 <script>
 
 import { queryUserListByPage,stopOrUseUser,deleteUserByUserSerial,updateUser,createUser } from '@/api/user'
+import { validUsername,validEmail,validMobile } from '@/api/validate'
 import Pagination from '@/components/Pagination'
 import ElDragSelect from '@/components/DragSelect'
 import { queryRoleList } from '@/api/role'
@@ -153,6 +150,80 @@ export default {
   name: 'UserTable',
   components: { Pagination,ElDragSelect },
   data() {
+
+    const validateUsername = (rule, value, callback) => {
+      if(!value) {
+        callback(new Error('用户名不能为空！'))
+      }
+      else if (value.length < 5 || value.length > 15){
+        callback(new Error('用户名长度需要控制在在5到15之间！'))
+      }
+      else if (!this.validateFlag) {
+        callback()
+      }
+      else{
+        validUsername(value).then(response => {
+          let flag = response.flag
+          if(!flag){
+            callback(new Error('用户名已存在！'))
+          }
+          callback()
+        })
+      }
+    }
+
+    const validateMobile = (rule, value, callback) => {
+      if(!value) {
+        callback(new Error('手机号不能为空！'))
+      }
+      else if(!(/^1[3456789]\d{9}$/.test(value))){
+        callback(new Error('手机号格式不正确！'))
+      }
+      else if (!this.validateFlag) {
+        callback()
+      }
+      else{
+        validMobile(value).then(response => {
+          let flag = response.flag
+          if(!flag){
+            callback(new Error('已有相同的手机号！'))
+          }
+          callback()
+        })
+      }
+    }
+
+    const validateEmail = (rule, value, callback) => {
+      const mailReg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
+      if(!value) {
+        callback(new Error('邮箱不能为空！'))
+      }
+      else if (!mailReg.test(value)){
+        callback(new Error('请输入正确的邮箱格式！'))
+      }
+      else if (!this.validateFlag) {
+        callback()
+      }
+      else{
+        validEmail(value).then(response => {
+          let flag = response.flag
+          if(!flag){
+            callback(new Error('已有相同的邮箱！'))
+          }
+          callback()
+        })
+      }
+    }
+
+    const validateDepartment = (rule, value, callback) => {
+      if(!this.temp.departmentSerial) {
+        callback(new Error('请为客户选择部门！'))
+      }
+      else{
+        callback()
+      }
+    }
+
     return {
       listLoading: true,
       list: null,
@@ -164,6 +235,21 @@ export default {
         search: ''
       },
       rules: {
+        username: [
+          { required: true,validator: validateUsername, trigger: 'blur' }
+        ],
+        email: [
+          { required: true,validator: validateEmail, trigger: 'blur' }
+        ],
+        mobile: [
+          { required: true,validator: validateMobile, trigger: 'blur' }
+        ],
+        roles: [
+          { required: true,message: '请配置角色！', trigger: 'blur' }
+        ],
+        department: [
+          { required: true,validator: validateDepartment, trigger: 'change' }
+        ]
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -171,6 +257,7 @@ export default {
         update: '编辑',
         create: '新增'
       },
+      validateFlag: true,
       roleList: [],
       departmentList: [],
       temp: {
@@ -224,8 +311,15 @@ export default {
     },
     handleUpdate(row) {
       this.showFlag = 'true'
+      this.validateFlag = false
       this.getRoles()
       this.getDepartments()
+      this.handleUpdateData(row)
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    handleUpdateData(row) {
       this.temp.roles = []
       this.temp.userSerial = row.userSerial
       this.temp.username = row.username
@@ -239,20 +333,27 @@ export default {
       this.temp.userUpdateTime = row.userUpdateTime
       if(row.department!==null){
         this.temp.departmentSerial = row.department.departmentSerial
+      }else {
+        this.temp.departmentSerial = ''
       }
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       for (const item of row.roleList) {
         this.temp.roles.push(item.roleSerial)
       }
+    },
+    handleCreate() {
+      // 新建的时候有校验
+      this.validateFlag = true
+      this.showFlag = 'false'
+      this.getRoles()
+      this.getDepartments()
+      this.handleCreateData()
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    handleCreate() {
-      this.showFlag = 'false'
-      this.getRoles()
-      this.getDepartments()
+    handleCreateData() {
       this.temp = {
         userSerial: '',
         username: '',
@@ -270,9 +371,6 @@ export default {
       }
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
     },
     getRoles() {
       queryRoleList().then(response => {

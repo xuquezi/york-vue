@@ -49,6 +49,12 @@ const applyRouter = {
       component: () => import('@/views/apply/cancelApply/index'),
       name: 'CancelApply',
       meta: {title: '被取消流程', noCache: true}
+    },
+    {
+      path: 'finishApply',
+      component: () => import('@/views/apply/finishApply/index'),
+      name: 'FinishApply',
+      meta: {title: '审批完成流程', noCache: true}
     }
   ]
 }

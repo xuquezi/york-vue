@@ -46,10 +46,18 @@ export function updateDepartment(data) {
   })
 }
 
-export function editDepartmentUser(data) {
+export function deleteDepartmentByDepartmentSerial(departmentSerial) {
   return request({
-    url: '/department/editDepartmentUser',
-    method: 'put',
-    data
+    url: '/department/deleteDepartmentByDepartmentSerial',
+    method: 'delete',
+    params: { departmentSerial }
+  })
+}
+
+export function departmentUserQuery(departmentSerial) {
+  return request({
+    url: '/department/departmentUserQuery',
+    method: 'get',
+    params: { departmentSerial }
   })
 }

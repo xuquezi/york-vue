@@ -45,7 +45,6 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-    // console.log(res.code)
     // if the custom code is not 10001,10002 it is judged as an error.
     if (res.code !== 10001 && res.code !== 10002 ) {
       // 20004: Token过期;在下面判断
@@ -72,7 +71,6 @@ service.interceptors.response.use(
           })
         })
       }
-      // console.log(res.code === 20005)
       if(res.code === 20005){
         router.push({ path: '/500' })
       }

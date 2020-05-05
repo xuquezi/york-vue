@@ -24,7 +24,7 @@
       <el-table-column label="更新时间" prop="roleUpdateTime" width="200"/>
       <el-table-column label="更新用户" prop="roleUpdateUser" width="150"/>
       <el-table-column
-        align="right" fixed="right" width="250">
+        align="right" fixed="right" width="350">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -43,6 +43,10 @@
             size="mini"
             type="primary"
             @click="deleteRole(scope.row)">删除</el-button>
+          <el-button
+            size="mini"
+            type="warning"
+            @click="queryUserByRole(scope.row)">用户查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -103,17 +107,54 @@
         <el-button type="primary" @click="dialogStatus==='create'?createRole():updateRole()">{{ '确定' }}</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :title="'角色用户列表'" :visible.sync="userRoleVisible" v-on:close="cancelUserRoleDialog">
+      <el-table :data="userRoleList" align="center">
+        <el-table-column property="username" label="用户名" width="200" />
+        <el-table-column label="状态" class-name="status-col" width="200" >
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.status=='0'" :type="scope.row.status | statusFilter" >启用</el-tag>
+            <el-tag v-if="scope.row.status=='1'" :type="scope.row.status| statusFilter" >停用</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column property="department.departmentName" label="用户部门" width="200" />
+      </el-table>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import ElDragSelect from '@/components/DragSelect'
-  import { queryRoleListByPage,stopOrUseRole,deleteRoleByRoleSerial,updateRole,createRole } from '@/api/role'
+  import { queryRoleListByPage,stopOrUseRole,deleteRoleByRoleSerial,updateRole,createRole,queryUserByRole } from '@/api/role'
+  import { validRoleName } from '@/api/validate'
   export default {
     name: 'RoleTable',
     components: { Pagination, ElDragSelect },
+
     data() {
+      const validateRoleName = (rule, value, callback) => {
+        if(!value) {
+          callback(new Error('角色名不能为空！'))
+        }
+        else if (value.length < 3 || value.length > 15){
+          callback(new Error('角色名长度需要控制在在3到15之间！'))
+        }
+        else if (!this.validateFlag) {
+          callback()
+        }
+        else{
+          validRoleName(value).then(response => {
+            let flag = response.flag
+            if(!flag){
+              callback(new Error('用户名已存在！'))
+            }
+            callback()
+          })
+        }
+      }
+
       return {
         temp: {
           roleSerial: '',
@@ -125,8 +166,15 @@
           roleUpdateUser: '',
           status: '1'
         },
+        validateFlag: true,
         showFlag: 'true',
         rules: {
+          roleName: [
+            { required: true,validator: validateRoleName, trigger: 'blur' }
+          ],
+          roleDesc: [
+            { required: true,message: '请输入角色的描述！', trigger: 'blur' }
+          ]
         },
         textMap: {
           update: '编辑',
@@ -135,7 +183,9 @@
         listLoading: true,
         total: 0,
         list: null,
+        userRoleList: null,
         dialogFormVisible: false,
+        userRoleVisible: false,
         dialogStatus: '',
         listQuery: {
           page: 1,
@@ -167,6 +217,10 @@
       },
       cancel() {
         this.dialogFormVisible = false
+      },
+      cancelUserRoleDialog() {
+        this.userRoleVisible = false
+        this.userRoleList = null
       },
       createRole() {
         this.$refs['dataForm'].validate((valid) => {
@@ -204,7 +258,16 @@
         })
       },
       handleCreate() {
+        this.validateFlag = true
         this.showFlag = 'false'
+        this.dialogStatus = 'create'
+        this.dialogFormVisible = true
+        this.handleCreateData()
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
+      },
+      handleCreateData() {
         this.temp = {
           roleSerial: '',
           roleName: '',
@@ -215,14 +278,16 @@
           roleUpdateTime: '',
           roleUpdateUser: ''
         }
-        this.dialogStatus = 'create'
-        this.dialogFormVisible = true
+      },
+      handleUpdate(row) {
+        this.validateFlag = false
+        this.showFlag = 'true'
+        this.handleUpdateData(row)
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
       },
-      handleUpdate(row) {
-        this.showFlag = 'true'
+      handleUpdateData(row) {
         this.temp.roleSerial = row.roleSerial
         this.temp.roleName = row.roleName
         this.temp.roleDesc = row.roleDesc
@@ -232,9 +297,6 @@
         this.temp.roleUpdateUser = row.roleUpdateUser
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].clearValidate()
-        })
       },
       deleteRole(row) {
         this.$confirm('确定删除该角色吗？', '提示', {
@@ -257,6 +319,12 @@
             message: '已取消删除'
           });
         });
+      },
+      queryUserByRole(row) {
+        this.userRoleVisible = true
+        queryUserByRole(row.roleSerial).then(response => {
+          this.userRoleList = response.list
+        })
       },
       stopOrUseRole(val) {
         this.$confirm('确定要停用/启用该角色吗？', '提示', {

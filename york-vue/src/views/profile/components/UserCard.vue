@@ -1,7 +1,7 @@
 <template>
   <el-card style="margin-bottom:20px;">
     <div slot="header" class="clearfix">
-      <span>About me</span>
+      <span>个人信息</span>
     </div>
 
     <div class="user-profile">
@@ -33,7 +33,8 @@ export default {
           name: '',
           email: '',
           avatar: '',
-          role: ''
+          role: '',
+          departmentName: ''
         }
       }
     }

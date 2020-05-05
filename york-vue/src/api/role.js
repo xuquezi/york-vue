@@ -15,6 +15,14 @@ export function queryRoleListByPage(query) {
   })
 }
 
+export function queryUserByRole(roleSerial) {
+  return request({
+    url: '/role/queryUserByRole',
+    method: 'get',
+    params: { roleSerial }
+  })
+}
+
 export function stopOrUseRole(roleSerial,status) {
   return request({
     url: '/role/stopOrUseRole',

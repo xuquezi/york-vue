@@ -13,12 +13,16 @@
       <el-table-column label="当前处理人id" prop="taskAssignee" width="200"/>
       <el-table-column label="当前处理人名称" prop="taskAssigneeName" width="200"/>
       <el-table-column
-        align="center" fixed="right" width="200">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleApply(scope.row)">申请</el-button>
+          align="center" fixed="right" width="300">
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              type="danger"
+              @click="handleApply(scope.row)">申请</el-button>
+            <el-button
+              size="mini"
+              type="default"
+              @click="queryProcess(scope.row)">流程查看</el-button>
           <el-button
             size="mini"
             type="warning"
@@ -50,6 +54,21 @@
         <el-button type="primary" @click="applyLeaveProcess()">{{ '确定' }}</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="流程步骤详情" :visible.sync="flowDetailVisible" v-on:close="closeDialog">
+      <el-timeline>
+        <el-timeline-item :timestamp="processFlowDetail.timestamp" placement="top" v-for="(processFlowDetail, index) in taskList">
+          <el-card>
+            <h4>{{processFlowDetail.title}}</h4>
+            <p>{{processFlowDetail.content}}</p>
+          </el-card>
+        </el-timeline-item>
+      </el-timeline>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="closeDialog()">{{ '关闭' }}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -57,7 +76,7 @@
   import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
   import { mapGetters } from 'vuex'
   import ElDragSelect from '@/components/DragSelect'
-  import { queryLeaveBackApplyListByPage,applyLeaveProcess,cancelProcess } from '@/api/apply'
+  import { queryLeaveBackApplyListByPage,applyLeaveProcess,cancelProcess,queryProcess } from '@/api/apply'
   export default {
     name: 'WaitApplyIndex',
     components: { Pagination, ElDragSelect },
@@ -71,6 +90,8 @@
     },
     data() {
       return {
+        taskList: [],
+        flowDetailVisible: false,
         listLoading: true,
         total: 0,
         list: null,
@@ -102,6 +123,17 @@
       this.getList()
     },
     methods: {
+      closeDialog() {
+        this.taskList = []
+        this.flowDetailVisible = false
+
+      },
+      queryProcess(row) {
+        queryProcess(row.taskDefinitionId,row.taskInstanceId).then(response=> {
+          this.taskList = response.list
+          this.flowDetailVisible = true
+        })
+      },
       getList() {
         this.listLoading = true
         queryLeaveBackApplyListByPage(this.listQuery).then(response => {

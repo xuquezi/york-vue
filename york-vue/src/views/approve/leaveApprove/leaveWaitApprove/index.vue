@@ -61,7 +61,8 @@
 <script>
   import Pagination from '@/components/Pagination'
   import ElDragSelect from '@/components/DragSelect'
-  import { queryLeaveWaitApproveListByPage,getLeaveApplyData,agreeLeaveApply,backLeaveApply } from '@/api/apply'
+  import { getLeaveApplyData } from '@/api/apply'
+  import { queryLeaveWaitApproveListByPage,agreeLeaveApply,backLeaveApply } from '@/api/approve'
   export default {
     name: 'WaitApproveIndex',
     components: { Pagination, ElDragSelect },
